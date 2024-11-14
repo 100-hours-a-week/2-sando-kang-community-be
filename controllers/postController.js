@@ -4,24 +4,23 @@ const authModel = require('../models/authModel');
 const commentModel = require('../models/commentModel');
 
 //NOTE: posts.js 연동 - 게시글 목록 조회
-exports.getPosts = (req, res) => {
+exports.getPosts = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const pageSize = 5;
     const startIndex = (page - 1) * pageSize;
 
-    postModel.getPaginatedPosts(startIndex, pageSize, async (err, posts) => {
-        if (err) {
-            return res.status(500).json(responseFormatter(false, 'server_error'));
-        }
-        try {
-          
-            const postData = await Promise.all(postPromises);
-            res.json(responseFormatter(true, 'post_get_success', { posts: postData }));
-        } catch (error) {
-            res.status(500).json(responseFormatter(false, 'server_error'));
-        }
-    });
-};
+    console.log(`pagesize : ${pageSize}`);
+    console.log(`startIndex : ${startIndex}`);
+    try{
+        const postData =  await postModel.getPaginatedPosts(startIndex, pageSize);
+        res.json(responseFormatter(true, 'request_success', { postData }));
+
+    }catch(err){
+        return res.status(500).json(responseFormatter(false, 'server_error'));
+    }
+
+}
+
 
 //NOTE: post.js - 게시글 + 댓글 조회
 exports.getPostsById = async (req, res) => {

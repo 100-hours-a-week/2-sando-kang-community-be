@@ -2,11 +2,32 @@ const connection = require('../db/db')
 
 // NOTE: 게시글 목록 조회
 exports.getPaginatedPosts = (startIndex, pageSize, callback) => {
-    const query = `SELECT * FROM post ORDER BY date DESC LIMIT ?, ?`;
-    connection.query(query, [startIndex, pageSize], (err, results) => {
-        if (err) return callback(err);
-        callback(null, results);
-    });
+    return new Promise((resolve, reject)=>{
+        const query = `
+        SELECT 
+            post.id,
+            user.nickname AS author,
+            post.title,
+            post.content,
+            post.image,
+            post.date,
+            post.likes,
+            post.views,
+            post.comments 
+        FROM 
+            post 
+        JOIN
+            user ON post.user_id = user.id
+        ORDER BY date 
+        DESC LIMIT ?, ?`;
+        connection.query(query, [startIndex, pageSize], (err, results) => {
+            if (err) {
+                return reject(`server error : ${err}`); 
+            }
+            resolve(results)
+        });
+    })
+    
 };
 
 // NOTE: 게시글 작성
