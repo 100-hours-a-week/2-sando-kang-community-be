@@ -24,15 +24,11 @@ exports.getPosts = (req, res) => {
     });
 };
 
-//NOTE: post.js연동 - 게시글 + 댓글 정보 조회
 exports.getPostsById = async (req, res) => {
     const { postId } = req.params;
-
-    console.log(`postId: ${postId}`);
     
     try {
         const post = await postModel.getPostById(postId);
-        console.log(post);
 
         const user = await authModel.findUserById(post.user_id);
         const author = user ? user.nickname : 'Unknown';
@@ -48,12 +44,20 @@ exports.getPostsById = async (req, res) => {
             date: comment.date,
         }));
 
+        // 이미지 데이터를 Base64로 인코딩
+        let base64Image = null;
+        if (post.image) {
+            base64Image = Buffer.from(post.image).toString('base64');
+            base64Image = `data:image/png;base64,${base64Image}`; // 이미지 MIME 타입에 맞춰 설정
+        }
+
+
         const postData = {
             post_id: post.id,
             title: post.title,
             content: post.content,
             updatePostDate: post.date,
-            image: post.image,
+            image: base64Image, // Base64로 변환된 이미지
             author: author,
             profile: profileImg,
             likesCnt: post.likes,
@@ -69,6 +73,7 @@ exports.getPostsById = async (req, res) => {
         return res.status(500).json(responseFormatter(false, 'server_error'));
     }
 };
+
 
 
 
@@ -103,12 +108,7 @@ exports.getPostById = (req, res) => {
 //NOTE: 게시글 수정
 exports.updatePost = (req, res) => {
     const { user_id, post_id, title, content, date } = req.body;
-    const image = req.file ? req.file.buffer.toString('base64') : null; // 이미지 파일을 Base64로 변환 (필요 시)
-    console.log(`user_id : ${user_id}`);
-    console.log(`post_id : ${post_id}`);
-    console.log(`title : ${title}`);
-    console.log(`content : ${content}`);
-    console.log(`image : ${image ? '이미지가 있습니다.' : '이미지가 없습니다.'}`);
+    const image = req.file ? req.file.buffer.toString('base64') : null;
 
     // 데이터베이스에 저장
     postModel.updatePost(user_id, post_id, title, content, image, date, (err, result) => {
@@ -120,14 +120,25 @@ exports.updatePost = (req, res) => {
 };
 
 
-//NOTE: 게시글 삭제
-exports.deletePost = (req, res) => {
-    const { user_id, post_id } = req.body;
+// NOTE: 게시글 삭제
+exports.deletePost = async (req, res) => {
+    const { post_id } = req.body;
 
-    postModel.deletePost(user_id, post_id, (err, result) => {
-        if (err) {
+    try {
+        
+        const postResult = await postModel.deletePost(post_id);
+        if (!postResult) {
+            return res.status(404).json(responseFormatter(false, 'invalid_request'));
+        }
+        
+        const commentResult = await commentModel.deleteCommentByPostId(post_id);
+        if (!commentResult) {
             return res.status(500).json(responseFormatter(false, 'server_error'));
         }
+
         res.json(responseFormatter(true, 'delete_success'));
-    });
+    } catch (err) {
+        console.error('Error deleting post or comments:', err);
+        res.status(500).json(responseFormatter(false, 'server_error'));
+    }
 };

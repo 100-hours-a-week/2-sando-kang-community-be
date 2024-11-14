@@ -10,7 +10,6 @@ const moment = require('moment-timezone');
 const rotatingFileStream = require('rotating-file-stream');
 const fs = require('fs');
 
-
 const app = express();
 const PORT = 3000;
 
@@ -21,7 +20,6 @@ const limiter = rateLimit({
   standardHeaders: true, 
   legacyHeaders: false, 
 });
-
 
 // Routers
 const authRouter = require('./routes/authRoutes');
@@ -57,11 +55,25 @@ app.use(express.json());
 app.use(timeout('15s'));
 app.use(haltOnTimedout); 
 app.use(limiter);
+
+// Helmet 설정: Content Security Policy 활성화
 app.use(
   helmet({
-    contentSecurityPolicy: false,
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"], // 기본적으로 모든 리소스는 동일 출처에서만 로드
+        scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"], // 스크립트는 동일 출처 또는 인라인/평가 가능
+        styleSrc: ["'self'", "'unsafe-inline'"], // 스타일은 동일 출처 또는 인라인 가능
+        imgSrc: ["'self'", "data:", "https://*.example.com"], // 이미지 리소스는 동일 출처 또는 data URI 허용
+        fontSrc: ["'self'"], // 폰트 리소스는 동일 출처에서만 로드
+        connectSrc: ["'self'"], // Ajax, WebSocket 등의 연결은 동일 출처에서만 가능
+        objectSrc: ["'none'"], // 플러그인 객체는 사용하지 않음
+        upgradeInsecureRequests: [], // HTTP를 HTTPS로 자동 업그레이드
+      },
+    },
   })
 );
+
 app.use(session({
   secret: 'my_secret_key', 
   resave: false, 

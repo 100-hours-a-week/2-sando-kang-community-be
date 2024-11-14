@@ -11,7 +11,7 @@ exports.getPaginatedPosts = (startIndex, pageSize, callback) => {
 
 // NOTE: 게시글 작성
 exports.createPost = (user_id, title, content, image, date, callback) => {
-    const query = 'INSERT INTO post (user_id, title, content, image, date) VALUES (?, ?, ?, ?, ?)';
+    const query = 'INSERT INTO post (user_id, title, content, image, date, likes, views, comments) VALUES (?, ?, ?, ?, ?, 1,1,1)';
     connection.query(query, [user_id, title, content, image, date], (err, results) => {
         if (err) return callback(err);
         callback(null, results.insertId);
@@ -46,13 +46,20 @@ exports.updatePost = (user_id, post_id, title, content, image, date,  callback) 
 };
 
 // NOTE: 게시글 삭제
-exports.deletePost = (user_id, post_id, callback) => {
-    const query = `DELETE FROM post WHERE user_id = ? AND id = ?`;
-    connection.query(query, [user_id, post_id], (err, results) => {
-        if (err) return callback(err);
-        callback(null, results);
+exports.deletePost = (post_id) => {
+    return new Promise((resolve, reject) => {
+        const query = `DELETE FROM post WHERE id = ?`;
+        
+        connection.query(query, [post_id], (err, results) => {
+            if (err) {
+                reject(err);  // 에러 발생 시 reject 호출
+            } else {
+                resolve(results);  // 성공 시 resolve 호출
+            }
+        });
     });
 };
+
 
 exports.addReply = (post_id, callback) => {
     const query = `UPDATE post SET comments = comments + 1 WHERE id = ?`;

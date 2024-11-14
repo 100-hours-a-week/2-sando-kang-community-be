@@ -75,3 +75,20 @@ exports.deleteComment = (comment_id, callback) => {
         }
     });
 };
+
+
+// NOTE: 댓글 삭제 (게시글에 대한 댓글 삭제)
+exports.deleteCommentByPostId = (post_id) => {
+    return new Promise((resolve, reject) => {
+        const query = `DELETE FROM comment WHERE post_id = ?`;
+        
+        connection.query(query, [post_id], (err, results) => {
+            if (err) {
+                console.error('댓글 삭제 중 오류 발생:', err);
+                reject(err);  // 에러 발생 시 reject 호출
+            } else {
+                resolve(results);  // 성공 시 resolve 호출
+            }
+        });
+    });
+};
