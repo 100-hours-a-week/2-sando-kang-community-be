@@ -3,7 +3,6 @@ const postModel = require('../models/postModel');
 const authModel = require('../models/authModel');
 const commentModel = require('../models/commentModel');
 
-
 //NOTE: posts.js 연동 - 게시글 목록 조회
 exports.getPosts = (req, res) => {
     const page = parseInt(req.query.page) || 1;
@@ -15,7 +14,7 @@ exports.getPosts = (req, res) => {
             return res.status(500).json(responseFormatter(false, 'server_error'));
         }
         try {
-            // 모든 게시글에 대한 정보 가져오기
+          
             const postData = await Promise.all(postPromises);
             res.json(responseFormatter(true, 'post_get_success', { posts: postData }));
         } catch (error) {
@@ -24,6 +23,7 @@ exports.getPosts = (req, res) => {
     });
 };
 
+//NOTE: post.js - 게시글 + 댓글 조회
 exports.getPostsById = async (req, res) => {
     const { postId } = req.params;
     
@@ -36,7 +36,6 @@ exports.getPostsById = async (req, res) => {
 
         const comments = await commentModel.findCommentsByPostId(postId);
 
-        console.log(comments);
         const formattedComments = comments.map((comment) => ({
             id: comment.id,
             content: comment.comment,
@@ -44,20 +43,17 @@ exports.getPostsById = async (req, res) => {
             date: comment.date,
         }));
 
-        // 이미지 데이터를 Base64로 인코딩
-        let base64Image = null;
+        let imageUrl = null;
         if (post.image) {
-            base64Image = Buffer.from(post.image).toString('base64');
-            base64Image = `data:image/png;base64,${base64Image}`; // 이미지 MIME 타입에 맞춰 설정
+            imageUrl = `${process.env.BASE_URL || 'http://127.0.0.1:3000'}/${post.image}`;
         }
-
 
         const postData = {
             post_id: post.id,
             title: post.title,
             content: post.content,
             updatePostDate: post.date,
-            image: base64Image, // Base64로 변환된 이미지
+            image: imageUrl,
             author: author,
             profile: profileImg,
             likesCnt: post.likes,
@@ -76,10 +72,10 @@ exports.getPostsById = async (req, res) => {
 
 
 
-
-//NOTE: 게시글 작성
+// NOTE: 게시글 작성
 exports.createPost = (req, res) => {
-    const { user_id, title, content, image } = req.body;
+    const { user_id, title, content } = req.body;
+    const image = req.file ? req.file.path : null;
     const date = new Date().toISOString().slice(0, 19).replace('T', ' ');
 
     postModel.createPost(user_id, title, content, image, date, (err, postId) => {
@@ -108,9 +104,15 @@ exports.getPostById = (req, res) => {
 //NOTE: 게시글 수정
 exports.updatePost = (req, res) => {
     const { user_id, post_id, title, content, date } = req.body;
-    const image = req.file ? req.file.buffer.toString('base64') : null;
+    const image = req.file ? req.file.path : null;
 
-    // 데이터베이스에 저장
+    console.log(`userId:  ${user_id}`);
+    console.log(`postId:  ${post_id}`);
+    console.log(`updatedTitle:  ${title}`);
+    console.log(`updatedContent:  ${content}`);
+    console.log(`fileInput:  ${image}`);
+    console.log(`date:  ${date}`);
+
     postModel.updatePost(user_id, post_id, title, content, image, date, (err, result) => {
         if (err) {
             return res.status(500).json(responseFormatter(false, 'server_error'));
@@ -141,4 +143,17 @@ exports.deletePost = async (req, res) => {
         console.error('Error deleting post or comments:', err);
         res.status(500).json(responseFormatter(false, 'server_error'));
     }
+};
+
+//NOTE: 게시글 좋아요+1
+exports.patchPost = (req, res) => {
+    const { post_id } = req.body;
+
+    // 데이터베이스에 저장
+    postModel.patchPost(post_id,(err, result) => {
+        if (err) {
+            return res.status(500).json(responseFormatter(false, 'server_error'));
+        }
+        res.json(responseFormatter(true, 'update_success'));
+    });
 };

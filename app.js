@@ -55,6 +55,7 @@ app.use(express.json());
 app.use(timeout('15s'));
 app.use(haltOnTimedout); 
 app.use(limiter);
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Helmet 설정: Content Security Policy 활성화
 app.use(

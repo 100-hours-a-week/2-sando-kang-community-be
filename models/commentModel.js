@@ -17,7 +17,6 @@ exports.findCommentsByPostId = (postId) => {
             comment.date DESC
     `;
     
-    // Promise로 반환하여 async/await 방식으로 처리
     return new Promise((resolve, reject) => {
         connection.query(query, [postId], (err, results) => {
             if (err) {
@@ -76,8 +75,6 @@ exports.deleteComment = (comment_id, callback) => {
     });
 };
 
-
-// NOTE: 댓글 삭제 (게시글에 대한 댓글 삭제)
 exports.deleteCommentByPostId = (post_id) => {
     return new Promise((resolve, reject) => {
         const query = `DELETE FROM comment WHERE post_id = ?`;
@@ -85,9 +82,9 @@ exports.deleteCommentByPostId = (post_id) => {
         connection.query(query, [post_id], (err, results) => {
             if (err) {
                 console.error('댓글 삭제 중 오류 발생:', err);
-                reject(err);  // 에러 발생 시 reject 호출
+                reject(err);  
             } else {
-                resolve(results);  // 성공 시 resolve 호출
+                resolve(results); 
             }
         });
     });

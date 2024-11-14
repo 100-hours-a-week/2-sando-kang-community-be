@@ -4,10 +4,10 @@ const responseFormatter = require('../util/ResponseFormatter');
 
 //NOTE: 댓글 목록 조회
 exports.getCommentsByPostId = async (req, res) => {
-    const { postId } = req.params;  // URL 파라미터에서 postId 가져오기
+    const { postId } = req.params;
 
 
-    if (!postId) {  // postId가 없으면 400 에러 반환
+    if (!postId) { 
         return res.status(400).json({
             success: false,
             message: 'missing_post_id'
@@ -15,7 +15,7 @@ exports.getCommentsByPostId = async (req, res) => {
     }
 
     try {
-        const comments = await commentModel.getCommentsByPostId(postId);  // DB 쿼리 메서드 호출
+        const comments = await commentModel.getCommentsByPostId(postId); 
 
         if (!comments || comments.length === 0) {
             return res.status(404).json({
@@ -23,14 +23,14 @@ exports.getCommentsByPostId = async (req, res) => {
                 message: 'no_comments_found'
             });
         }
-        // 성공적으로 댓글 데이터를 가져왔을 경우
+
         return res.status(200).json({
             success: true,
             message: 'comment_get_success',
             data: { comments }
         });
     } catch (err) {
-        // 서버 오류 발생 시
+
         console.error('댓글 조회 오류:', err);
         return res.status(500).json({
             success: false,
@@ -38,8 +38,6 @@ exports.getCommentsByPostId = async (req, res) => {
         });
     }
 };
-
-
 
 //NOTE: 댓글 등록
 exports.createComment = (req, res) => {
@@ -54,14 +52,12 @@ exports.createComment = (req, res) => {
             return res.status(500).json(responseFormatter(false, 'server_error'));
         }
 
-        // 댓글 생성 후, 댓글 수를 업데이트
         postModel.addReply(post_id, (err) => {
             if (err) {
                 console.error('댓글 수 업데이트 중 오류 발생:', err);
                 return res.status(500).json(responseFormatter(false, 'server_error'));
             }
             
-            // 성공 응답 전송
             res.json(responseFormatter(true, 'register_success'));
         });
     });

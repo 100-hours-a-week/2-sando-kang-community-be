@@ -9,21 +9,20 @@ exports.findUserByEmailAndPassword = (email, password, callback) => {
 };
 
 
-// authModel.js 내에서 findUserById를 Promise로 변경
 exports.findUserById = (user_id) => {
     return new Promise((resolve, reject) => {
         const query = 'SELECT * FROM user WHERE id = ?';
         connection.query(query, [user_id], (err, results) => {
             if (err) {
                 console.error('쿼리 실행 오류:', err);
-                return reject(err);  // 오류 발생 시 reject
+                return reject(err);  
             }
 
             if (results.length === 0) {
                 console.error('사용자 찾기 실패');
-                return reject(new Error('User not found'));  // 사용자 없으면 reject
+                return reject(new Error('User not found'));
             }
-            resolve(results[0]);  // 정상적으로 사용자 반환
+            resolve(results[0]);
         });
     });
 };
