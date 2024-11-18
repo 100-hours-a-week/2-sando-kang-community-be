@@ -30,12 +30,12 @@ exports.createUser = (email, password, nickname, profile, callback) => {
     const query = 'INSERT INTO user (email, password, nickname, profile) VALUES (?, ?, ?, ?)';
     connection.query(query, [email, password, nickname, profile], (err, results) => {
         if (err) {
-            console.error('쿼리 실행 오류:', err);  // 에러 발생 시 출력
+            console.error('쿼리 실행 오류:', err);  
         } else {
-            console.log('쿼리 실행 결과:', results);  // 정상 실행된 결과 출력
+            console.log('쿼리 실행 결과:', results);  
         }
-        return callback(err, results);  // 콜백으로 오류 및 결과 반환
-    });
+        return callback(err, results); 
+    })
 };
 
 exports.deleteUser = (user_id, callback) => {

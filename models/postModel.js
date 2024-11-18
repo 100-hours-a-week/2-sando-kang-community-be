@@ -72,9 +72,9 @@ exports.deletePost = (post_id) => {
         
         connection.query(query, [post_id], (err, results) => {
             if (err) {
-                reject(err);  // 에러 발생 시 reject 호출
+                reject(err);  
             } else {
-                resolve(results);  // 성공 시 resolve 호출
+                resolve(results);
             }
         });
     });
