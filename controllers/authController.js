@@ -1,65 +1,69 @@
 const authModel = require('../models/authModel');
 const responseFormatter = require('../util/ResponseFormatter');
+const base64 = require('base-64');
+const session = require('express-session')
 
-// NOTE: 로그인
+//NOTE: 로그인
 exports.login = (req, res) => {
     const { email, password } = req.body;
-
-    authModel.findUserByEmailAndPassword(email, password, (err, user) => {
-        if (err) {
-            return res.status(500).json(responseFormatter(false, 'server_error'));
-        } else if (user) {
-
-            req.session.user = {
-                user_id: user.id,
-                email: user.email,
-                nickname: user.nickname,
-                profile: user.profile,
-            };
-
-            const responseData = {
-                user_id: user.id,
-                email: user.email,
-                nickname: user.nickname,
-                profile: user.profile,
-            };
-
-            return res.json(responseFormatter(true, 'login_success', responseData));
+  
+    const encodedPassword = base64.encode(password);
+  
+    authModel.findUserByEmail(email, (err, user) => {
+      if (err) {
+        return res.status(500).json(responseFormatter(false, 'server_error'));
+      } else if (user) {
+    
+        if (encodedPassword === user.password) {
+         
+          req.session.user = {
+            user_id: user.id,
+            email: user.email,
+            nickname: user.nickname,
+            profile: user.profile,
+          };
+  
+          const responseData = {
+            user_id: user.id,
+            email: user.email,
+            nickname: user.nickname,
+            profile: user.profile,
+          };
+  
+          res.setHeader('Access-Control-Allow-Origin', '*');
+          return res.json(responseFormatter(true, 'login_success', responseData));
         } else {
-            return res.status(400).json(responseFormatter(false, 'invalid_request'));
+          return res.status(400).json(responseFormatter(false, 'invalid_password'));
         }
+      } else {
+        return res.status(400).json(responseFormatter(false, 'user_not_found'));
+      }
     });
-};
-
-// NOTE: 인증 미들웨어
-exports.isAuthenticated = (req, res, next) => {
-    if (req.session.user) {
-        next(); 
-    } else {
-        return res.status(401).json(responseFormatter(false, 'unauthorized'));
-    }
-};
-
-// NOTE: 로그아웃
+  };
+  
+//NOTE: 로그아웃
 exports.logout = (req, res) => {
-    req.session.destroy(err => {
-        if (err) {
-            return res.status(500).json(responseFormatter(false, 'server_error'));
-        }
-        res.clearCookie('connect.sid');
-        return res.json(responseFormatter(true, 'logout_success'));
-    });
+req.session.destroy(err => {
+    if (err) {
+    return res.status(500).json(responseFormatter(false, 'server_error'));
+    }
+    res.clearCookie('connect.sid'); 
+    return res.json(responseFormatter(true, 'logout_success'));
+});
 };
 
-
-//NOTE: 회원 가입
+//NOTE: 회원가입
 exports.signin = (req, res) => {
-    const { email, password, nickname, profile } = req.body;
-    console.log('here');
-    authModel.createUser(email, password, nickname, profile, (err) => {
+    const { email, password, nickname } = req.body;
+    const profile = req.file ? req.file.path : null;
+
+    const encodedPassword = base64.encode(password);
+
+    authModel.createUser(email, encodedPassword, nickname, profile, (err) => {
         if (err) {
             return res.status(500).json(responseFormatter(false, 'server_error'));
         } else {
+            req.session.user = { email, nickname, profile };
             return res.json(responseFormatter(true, 'signin_success'));
         }
     });

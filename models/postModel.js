@@ -7,6 +7,7 @@ exports.getPaginatedPosts = (startIndex, pageSize, callback) => {
         SELECT 
             post.id,
             user.nickname AS author,
+            user.profile AS profile,
             post.title,
             post.content,
             post.image,

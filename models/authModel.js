@@ -1,13 +1,12 @@
 const connection = require('../db/db');
 
-exports.findUserByEmailAndPassword = (email, password, callback) => {
-    const query = 'SELECT * FROM user WHERE email = ? AND password = ?';
-    connection.query(query, [email, password], (err, results) => {
+exports.findUserByEmail = (email, callback) => {
+    const query = 'SELECT * FROM user WHERE email = ? ';
+    connection.query(query, [email], (err, results) => {
         if (err) return callback(err);
         return callback(null, results[0]);
     });
 };
-
 
 exports.findUserById = (user_id) => {
     return new Promise((resolve, reject) => {
@@ -26,9 +25,6 @@ exports.findUserById = (user_id) => {
         });
     });
 };
-
-
-
 
 exports.createUser = (email, password, nickname, profile, callback) => {
     const query = 'INSERT INTO user (email, password, nickname, profile) VALUES (?, ?, ?, ?)';
