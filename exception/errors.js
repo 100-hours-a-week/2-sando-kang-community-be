@@ -64,12 +64,12 @@ const ERROR_CODES = Object.freeze({
     },
 
     UPDATE_COMMENT_ERROR: {
-        code: '게시물 업데이트 실패하였습니다',
+        code: '댓글 업데이트 실패하였습니다',
         status: 50006,
     },
 
     DELETE_COMMENT_ERROR: {
-        code: '게시물 삭제 실패하였습니다',
+        code: '댓글 삭제 실패하였습니다',
         status: 50007,
     },
 
