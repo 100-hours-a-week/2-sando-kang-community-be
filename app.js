@@ -10,7 +10,9 @@ const morgan = require('morgan');
 const moment = require('moment-timezone');
 const rotatingFileStream = require('rotating-file-stream');
 const fs = require('fs');
-const db = require('./db/db'); // 데이터베이스 연결 가져오기
+const db = require('./db/db');
+const globalErrorHandler = require('./middleware/globalErrorHandler');
+
 
 const app = express();
 const PORT = 3000;
@@ -52,6 +54,7 @@ app.use(timeout('15s'));
 app.use(haltOnTimedout);
 app.use(limiter);
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use(globalErrorHandler);
 
 // Helmet 보안 설정
 app.use(
@@ -78,7 +81,7 @@ app.use(
     resave: false,
     saveUninitialized: false,
     store: sessionStore,
-    cookie: { secure: false }, // https 환경에서는 true로 변경
+    cookie: { secure: false },
   })
 );
 
