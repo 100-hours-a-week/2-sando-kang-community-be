@@ -1,11 +1,14 @@
 const connection = require('../db/db');
 
-exports.findUserByEmail = (email, callback) => {
-    const query = 'SELECT * FROM user WHERE email = ? ';
-    connection.query(query, [email], (err, results) => {
-        if (err) return callback(err);
-        return callback(null, results[0]);
-    });
+exports.findUserByEmail = (email) => {
+    return new Promise((resolve, reject)=>{
+        const query = 'SELECT * FROM user WHERE email = ? ';
+        connection.query(query, [email], (err, results) => {
+            if (err) return reject(err);
+            resolve(results[0]);
+        });
+    })
+    
 };
 
 exports.findUserById = (user_id) => {
