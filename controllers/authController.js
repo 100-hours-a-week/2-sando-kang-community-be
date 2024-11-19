@@ -1,4 +1,3 @@
-const AppError = require('../exception/AppError');
 const asyncHandler = require('../util/asyncHandler');
 const ERROR_CODES = require('../exception/errors')
 const authModel = require('../models/authModel');
