@@ -1,4 +1,3 @@
-const AppError = require('../exception/AppError');
 const asyncHandler = require('../util/asyncHandler');
 const ERROR_CODES = require('../exception/errors')
 const commentModel = require('../models/commentModel');
@@ -10,18 +9,18 @@ exports.getCommentsByPostId = asyncHandler(async (req, res) => {
     const { postId } = req.params;
 
     if (!postId) { 
-        throw new AppError(ERROR_CODES.MISSING_FIELDS);
+        res.json(responseFormatter(false, ERROR_CODES.MISSING_FIELDS, null));  
     }
 
     const comments = await commentModel.getCommentsByPostId(postId); 
 
     if (!comments || comments.length === 0) {
-        throw new AppError(ERROR_CODES.GET_COMMENT_ERROR);
+        res.json(responseFormatter(false, ERROR_CODES.GET_COMMENT_ERROR, null));  
     }
 
     return res.json({
         success: true,
-        message: '요청 성공',
+        message: 'get_comments_success',
         data: { comments }
     });
 });
@@ -31,16 +30,16 @@ exports.createComment = asyncHandler(async (req, res, next) => {
     const { user_id, post_id, comment, date } = req.body;
 
     if (!user_id || !post_id || !comment || !date) {
-        throw new AppError(ERROR_CODES.MISSING_FIELDS);
+        res.json(responseFormatter(false, ERROR_CODES.MISSING_FIELDS, null));  
     }
 
     const createComment = await commentModel.createComment(user_id, post_id, comment, date);
-    if(!createComment) throw new AppError(ERROR_CODES.CREATE_COMMENT_ERROR);
+    if(!createComment) res.json(responseFormatter(false, ERROR_CODES.CREATE_COMMENT_ERROR, null));  
 
     const addReply = await postModel.addReply(post_id);
-    if(!addReply) throw new AppError(ERROR_CODES.UPDATE_COMMENT_ERROR);
+    if(!addReply)res.json(responseFormatter(false, ERROR_CODES.UPDATE_COMMENT_ERROR, null));  
 
-    res.json(responseFormatter(true, '요청 성공'));
+    res.json(responseFormatter(true, 'create_comment_success'));
 });
 
 
@@ -49,15 +48,15 @@ exports.updateComment = asyncHandler(async (req, res, next) => {
     const { comment_id, content } = req.body;
 
     if (!comment_id || !content) {
-        throw new AppError(ERROR_CODES.MISSING_FIELDS);
+        res.json(responseFormatter(false, ERROR_CODES.MISSING_FIELDS, null));  
     }
 
     const result = await commentModel.updateComment(comment_id, content);
     if (!result) {
-        if(!addReply) throw new AppError(ERROR_CODES.UPDATE_COMMENT_ERROR);
+        if(!addReply) res.json(responseFormatter(false, ERROR_CODES.UPDATE_COMMENT_ERROR, null));  
     }
 
-    res.json(responseFormatter(true, '요청 성공'));
+    res.json(responseFormatter(true, 'update_comment_success'));
 });
 
 //NOTE: 댓글 삭제
@@ -65,18 +64,18 @@ exports.deleteComment = asyncHandler(async (req, res, next) => {
     const { comment, post_id } = req.body;
 
     if (!comment || !post_id) {
-        throw new AppError(ERROR_CODES.MISSING_FIELDS);
+        res.json(responseFormatter(false, ERROR_CODES.MISSING_FIELDS, null));  
     }
 
     const deleteResult = await commentModel.deleteComment(comment);
     if (!deleteResult) {
-        throw new AppError(ERROR_CODES.DELETE_COMMENT_ERROR);
+        res.json(responseFormatter(false, ERROR_CODES.DELETE_COMMENT_ERROR, null));  
     }
 
     const discountResult = await postModel.discountComment(post_id);
     if (!discountResult) {
-        throw new AppError(ERROR_CODES.UPDATE_COMMENT_ERROR);
+        res.json(responseFormatter(false, ERROR_CODES.UPDATE_COMMENT_ERROR, null));  
     }
 
-    res.json(responseFormatter(true, '요청 성공'));
+    res.json(responseFormatter(true, 'delete_comment_success'));
 });
