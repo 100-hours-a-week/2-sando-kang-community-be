@@ -1,4 +1,3 @@
-const AppError = require('../exception/AppError');
 const asyncHandler = require('../util/asyncHandler');
 const ERROR_CODES = require('../exception/errors')
 const responseFormatter = require('../util/ResponseFormatter');
@@ -17,9 +16,9 @@ exports.getPosts = asyncHandler(async (req, res) => {
    
     const postData =  await postModel.getPaginatedPosts(startIndex, pageSize);
     if(!postData){
-        throw new AppError(ERROR_CODES.GET_POST_ERROR);
+        res.json(responseFormatter(false, ERROR_CODES.GET_POST_ERROR, null));  
     }
-    res.json(responseFormatter(true, '요청 성공', { postData }));
+    res.json(responseFormatter(true, 'get_posts_success', { postData }));
 })
 
 
@@ -29,7 +28,7 @@ exports.getPostsById = asyncHandler(async (req, res, next) => {
 
     const post = await postModel.getPostById(postId);
     if (!post) {
-        throw new AppError(ERROR_CODES.GET_POST_ERROR);
+        res.json(responseFormatter(false, ERROR_CODES.GET_POST_ERROR, null));  
     }
 
     const user = await authModel.findUserById(post.user_id);
@@ -63,7 +62,7 @@ exports.getPostsById = asyncHandler(async (req, res, next) => {
         comment: formattedComments,
     };
 
-    res.json(responseFormatter(true, '요청 성공', { postData }));
+    res.json(responseFormatter(true, 'get_posts_succcess', { postData }));
 });
 
 //NOTE: 게시글 작성
@@ -73,14 +72,14 @@ exports.createPost = asyncHandler(async (req, res, next) => {
     const date = new Date().toISOString().slice(0, 19).replace('T', ' ');
 
     if (!user_id || !title || !content) {
-        throw new AppError(ERROR_CODES.MISSING_FIELDS);
+        res.json(responseFormatter(false, ERROR_CODES.MISSING_FIELDS, null));  
     }
 
     const postId = await postModel.createPost(user_id, title, content, image, date);
     if (!postId) {
-        throw new AppError(ERROR_CODES.CREATE_POST_ERROR);
+        res.json(responseFormatter(false, ERROR_CODES.CREATE_POST_ERROR, null));  
     }
-    res.json(responseFormatter(true, '요청 성공', { postId }));
+    res.json(responseFormatter(true, 'create_post_success', { postId }));
 });
 
 //NOTE: 특정 게시글 조회
@@ -88,15 +87,15 @@ exports.getPostById = asyncHandler(async (req, res, next) => {
     const { user_id, post_id } = req.query;
 
     if (!user_id || !post_id) {
-        throw new AppError(ERROR_CODES.MISSING_FIELDS);
+        res.json(responseFormatter(false, ERROR_CODES.MISSING_FIELDS, null));  
     }
 
     const post = await postModel.getPostById(user_id, post_id);
     if (!post || !post.length) {
-        throw new AppError(ERROR_CODES.GET_POST_ERROR);
+        res.json(responseFormatter(false, ERROR_CODES.GET_POST_ERROR, null));  
     }
 
-    res.json(responseFormatter(true, '요청 성공', { post: post[0] }));
+    res.json(responseFormatter(true, 'get_post_success', { post: post[0] }));
 });
 
 //NOTE: 게시글 수정
@@ -105,15 +104,15 @@ exports.updatePost = asyncHandler(async (req, res, next) => {
     const image = req.file ? req.file.path : null;
 
     if (!user_id || !post_id || !title || !content || !date) {
-        throw new AppError(ERROR_CODES.MISSING_FIELDS);
+        res.json(responseFormatter(false, ERROR_CODES.MISSING_FIELDS, null));  
     }
 
     const result = await postModel.updatePost(user_id, post_id, title, content, image, date);
     if (!result) {
-        throw new AppError(ERROR_CODES.UPDATE_POST_ERROR);
+        res.json(responseFormatter(false, ERROR_CODES.UPDATE_POST_ERROR, null));  
     }
 
-    res.json(responseFormatter(true, '요청 성공'));
+    res.json(responseFormatter(true, 'update_post_success'));
 });
 
 // NOTE: 게시글 삭제
@@ -121,20 +120,20 @@ exports.deletePost = asyncHandler(async (req, res, next) => {
     const { post_id } = req.body;
 
     if (!post_id) {
-        throw new AppError(ERROR_CODES.MISSING_FIELDS);
+        res.json(responseFormatter(false, ERROR_CODES.MISSING_FIELDS, null));  
     }
 
     const postResult = await postModel.deletePost(post_id);
     if (!postResult) {
-        throw new AppError(ERROR_CODES.DELETE_POST_ERROR);
+        res.json(responseFormatter(false, ERROR_CODES.DELETE_POST_ERROR, null));  
     }
 
     const commentResult = await commentModel.deleteCommentByPostId(post_id);
     if (!commentResult) {
-        throw new AppError(ERROR_CODES.DELETE_POST_COMMENT_ERROR);
+        res.json(responseFormatter(false, ERROR_CODES.DELETE_POST_COMMENT_ERROR, null));  
     }
 
-    res.json(responseFormatter(true, '요청 성공'));
+    res.json(responseFormatter(true, 'delete_post_success'));
 });
 
 // NOTE: 게시글 좋아요+1
@@ -142,13 +141,13 @@ exports.patchPost = asyncHandler(async (req, res, next) => {
     const { post_id } = req.body;
 
     if (!post_id) {
-        throw new AppError(ERROR_CODES.MISSING_FIELDS);
+        res.json(responseFormatter(false, ERROR_CODES.MISSING_FIELDS, null));  
     }
 
     const result = await postModel.patchPost(post_id);
     if (!result) {
-        throw new AppError(ERROR_CODES.UPDATE_POST_ERROR);
+        res.json(responseFormatter(false, ERROR_CODES.UPDATE_POST_ERROR, null));  
     }
 
-    res.json(responseFormatter(true, '요청 성공'));
+    res.json(responseFormatter(true, 'update_post_success'));
 });

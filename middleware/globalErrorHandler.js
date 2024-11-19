@@ -8,8 +8,8 @@ const globalErrorHandler = (err, req, res, next) => {
     }
 
     console.error('Unexpected Error:', err);
-    res.status(500).json(
-        responseFormatter(false, '서버 내부 오류')
+    res.status(50000).json(
+        responseFormatter(false, 'internal_server_error')
     );
 };
 
