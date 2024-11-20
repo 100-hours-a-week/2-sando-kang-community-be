@@ -71,8 +71,10 @@ exports.createPost = asyncHandler(async (req, res, next) => {
     const image = req.file ? req.file.path : null;
     const date = new Date().toISOString().slice(0, 19).replace('T', ' ');
 
-    if (!user_id || !title || !content) {
-        res.json(responseFormatter(false, ERROR_CODES.MISSING_FIELDS, null));  
+    for (const key in req.body) {
+        if (!req.body[key]) {
+            return res.json(responseFormatter(false, ERROR_CODES.MISSING_FIELDS(key), null));
+        }
     }
 
     const postId = await postModel.createPost(user_id, title, content, image, date);
@@ -86,8 +88,10 @@ exports.createPost = asyncHandler(async (req, res, next) => {
 exports.getPostById = asyncHandler(async (req, res, next) => {
     const { user_id, post_id } = req.query;
 
-    if (!user_id || !post_id) {
-        res.json(responseFormatter(false, ERROR_CODES.MISSING_FIELDS, null));  
+    for (const key in req.body) {
+        if (!req.body[key]) {
+            return res.json(responseFormatter(false, ERROR_CODES.MISSING_FIELDS(key), null));
+        }
     }
 
     const post = await postModel.getPostById(user_id, post_id);
@@ -103,8 +107,10 @@ exports.updatePost = asyncHandler(async (req, res, next) => {
     const { user_id, post_id, title, content, date } = req.body;
     const image = req.file ? req.file.path : null;
 
-    if (!user_id || !post_id || !title || !content || !date) {
-        res.json(responseFormatter(false, ERROR_CODES.MISSING_FIELDS, null));  
+    for (const key in req.body) {
+        if (!req.body[key]) {
+            return res.json(responseFormatter(false, ERROR_CODES.MISSING_FIELDS(key), null));
+        }
     }
 
     const result = await postModel.updatePost(user_id, post_id, title, content, image, date);
@@ -119,8 +125,10 @@ exports.updatePost = asyncHandler(async (req, res, next) => {
 exports.deletePost = asyncHandler(async (req, res, next) => {
     const { post_id } = req.body;
 
-    if (!post_id) {
-        res.json(responseFormatter(false, ERROR_CODES.MISSING_FIELDS, null));  
+    for (const key in req.body) {
+        if (!req.body[key]) {
+            return res.json(responseFormatter(false, ERROR_CODES.MISSING_FIELDS(key), null));
+        }
     }
 
     const postResult = await postModel.deletePost(post_id);
@@ -140,8 +148,10 @@ exports.deletePost = asyncHandler(async (req, res, next) => {
 exports.patchPost = asyncHandler(async (req, res, next) => {
     const { post_id } = req.body;
 
-    if (!post_id) {
-        res.json(responseFormatter(false, ERROR_CODES.MISSING_FIELDS, null));  
+    for (const key in req.body) {
+        if (!req.body[key]) {
+            return res.json(responseFormatter(false, ERROR_CODES.MISSING_FIELDS(key), null));
+        }
     }
 
     const result = await postModel.patchPost(post_id);

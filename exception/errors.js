@@ -1,9 +1,9 @@
 const ERROR_CODES = Object.freeze({
     // Bad Request Error
-    MISSING_FIELDS: {
-        code: 'invalid_parameter',
+    MISSING_FIELDS: (value) => ({
+        code: `invalid_${value}`,
         status: 40000,
-    },
+    }),
 
     // Unauthorized Error
     INVALID_PASSWORD: {

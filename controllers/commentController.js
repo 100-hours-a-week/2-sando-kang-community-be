@@ -8,8 +8,10 @@ const responseFormatter = require('../util/ResponseFormatter');
 exports.getCommentsByPostId = asyncHandler(async (req, res) => {
     const { postId } = req.params;
 
-    if (!postId) { 
-        res.json(responseFormatter(false, ERROR_CODES.MISSING_FIELDS, null));  
+    for (const key in req.body) {
+        if (!req.body[key]) {
+            return res.json(responseFormatter(false, ERROR_CODES.MISSING_FIELDS(key), null));
+        }
     }
 
     const comments = await commentModel.getCommentsByPostId(postId); 
@@ -29,8 +31,10 @@ exports.getCommentsByPostId = asyncHandler(async (req, res) => {
 exports.createComment = asyncHandler(async (req, res, next) => {
     const { user_id, post_id, comment, date } = req.body;
 
-    if (!user_id || !post_id || !comment || !date) {
-        res.json(responseFormatter(false, ERROR_CODES.MISSING_FIELDS, null));  
+    for (const key in req.body) {
+    if (!req.body[key]) {
+        return res.json(responseFormatter(false, ERROR_CODES.MISSING_FIELDS(key), null));
+        }
     }
 
     const createComment = await commentModel.createComment(user_id, post_id, comment, date);
@@ -47,8 +51,10 @@ exports.createComment = asyncHandler(async (req, res, next) => {
 exports.updateComment = asyncHandler(async (req, res, next) => {
     const { comment_id, content } = req.body;
 
-    if (!comment_id || !content) {
-        res.json(responseFormatter(false, ERROR_CODES.MISSING_FIELDS, null));  
+    for (const key in req.body) {
+        if (!req.body[key]) {
+            return res.json(responseFormatter(false, ERROR_CODES.MISSING_FIELDS(key), null));
+        }
     }
 
     const result = await commentModel.updateComment(comment_id, content);
@@ -63,8 +69,10 @@ exports.updateComment = asyncHandler(async (req, res, next) => {
 exports.deleteComment = asyncHandler(async (req, res, next) => {
     const { comment, post_id } = req.body;
 
-    if (!comment || !post_id) {
-        res.json(responseFormatter(false, ERROR_CODES.MISSING_FIELDS, null));  
+    for (const key in req.body) {
+        if (!req.body[key]) {
+            return res.json(responseFormatter(false, ERROR_CODES.MISSING_FIELDS(key), null));
+        }
     }
 
     const deleteResult = await commentModel.deleteComment(comment);
