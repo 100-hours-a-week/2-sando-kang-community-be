@@ -31,7 +31,7 @@ exports.getPaginatedPosts = (startIndex, pageSize) => {
 
 // NOTE: 게시글 작성
 exports.createPost = (user_id, title, content, image, date) => {
-    const query = 'INSERT INTO post (user_id, title, content, image, date, likes, views, comments) VALUES (?, ?, ?, ?, ?, 1, 1, 1)';
+    const query = 'INSERT INTO post (user_id, title, content, image, date, likes, views, comments) VALUES (?, ?, ?, ?, ?, 0, 1, 0)';
     return new Promise((resolve, reject) => {
         connection.query(query, [user_id, title, content, image, date], (err, results) => {
             if (err) return reject(err);

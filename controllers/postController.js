@@ -61,6 +61,7 @@ exports.getPostsById = asyncHandler(async (req, res, next) => {
         commentsCnt: post.comments,
         comment: formattedComments,
     };
+    console.log(postData)
     return res.json(responseFormatter(true, 'get_posts_succcess', { postData }));
 });
 
