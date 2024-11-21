@@ -17,7 +17,7 @@ exports.getCommentsByPostId = asyncHandler(async (req, res) => {
     const comments = await commentModel.getCommentsByPostId(postId); 
 
     if (!comments || comments.length === 0) {
-        res.json(responseFormatter(false, ERROR_CODES.GET_COMMENT_ERROR, null));  
+       return res.json(responseFormatter(false, ERROR_CODES.GET_COMMENT_ERROR, null));  
     }
 
     return res.json({
@@ -38,12 +38,14 @@ exports.createComment = asyncHandler(async (req, res, next) => {
     }
 
     const createComment = await commentModel.createComment(user_id, post_id, comment, date);
-    if(!createComment) res.json(responseFormatter(false, ERROR_CODES.CREATE_COMMENT_ERROR, null));  
-
+    if(!createComment) {
+        return res.json(responseFormatter(false, ERROR_CODES.CREATE_COMMENT_ERROR, null));  
+    }
     const addReply = await postModel.addReply(post_id);
-    if(!addReply)res.json(responseFormatter(false, ERROR_CODES.UPDATE_COMMENT_ERROR, null));  
-
-    res.json(responseFormatter(true, 'create_comment_success'));
+    if(!addReply){
+        return res.json(responseFormatter(false, ERROR_CODES.UPDATE_COMMENT_ERROR, null));  
+    }
+    return res.json(responseFormatter(true, 'create_comment_success'));
 });
 
 
@@ -59,10 +61,11 @@ exports.updateComment = asyncHandler(async (req, res, next) => {
 
     const result = await commentModel.updateComment(comment_id, content);
     if (!result) {
-        if(!addReply) res.json(responseFormatter(false, ERROR_CODES.UPDATE_COMMENT_ERROR, null));  
+        if(!addReply){
+          return res.json(responseFormatter(false, ERROR_CODES.UPDATE_COMMENT_ERROR, null));   
+        } 
     }
-
-    res.json(responseFormatter(true, 'update_comment_success'));
+    return res.json(responseFormatter(true, 'update_comment_success'));
 });
 
 //NOTE: 댓글 삭제
@@ -77,13 +80,13 @@ exports.deleteComment = asyncHandler(async (req, res, next) => {
 
     const deleteResult = await commentModel.deleteComment(comment);
     if (!deleteResult) {
-        res.json(responseFormatter(false, ERROR_CODES.DELETE_COMMENT_ERROR, null));  
+       return res.json(responseFormatter(false, ERROR_CODES.DELETE_COMMENT_ERROR, null));  
     }
 
     const discountResult = await postModel.discountComment(post_id);
     if (!discountResult) {
-        res.json(responseFormatter(false, ERROR_CODES.UPDATE_COMMENT_ERROR, null));  
+       return res.json(responseFormatter(false, ERROR_CODES.UPDATE_COMMENT_ERROR, null));  
     }
 
-    res.json(responseFormatter(true, 'delete_comment_success'));
+    return res.json(responseFormatter(true, 'delete_comment_success'));
 });
