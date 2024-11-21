@@ -68,7 +68,6 @@ exports.signin = asyncHandler(async (req, res, next) => {
       }
   }
 
-  console.log('hey')
   const encodedPassword = base64.encode(password);
   const createUser = await authModel.createUser(email, encodedPassword, nickname, profile);
   if(!createUser) {
