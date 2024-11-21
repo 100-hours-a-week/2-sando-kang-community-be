@@ -61,6 +61,7 @@ exports.getPostsById = asyncHandler(async (req, res, next) => {
         commentsCnt: post.comments,
         comment: formattedComments,
     };
+    console.log(postData)
     return res.json(responseFormatter(true, 'get_posts_succcess', { postData }));
 });
 
@@ -146,7 +147,7 @@ exports.patchPost = asyncHandler(async (req, res, next) => {
     const { post_id } = req.body;
 
     for (const key in req.body) {
-        if (!req.body[key]) {
+        if (!req.body[key] || req.body[key] == null) {
             return res.json(responseFormatter(false, ERROR_CODES.MISSING_FIELDS(key), null));
         }
     }
