@@ -13,13 +13,18 @@ exports.getPosts = asyncHandler(async (req, res) => {
 
     console.log(`pagesize : ${pageSize}`);
     console.log(`startIndex : ${startIndex}`);
-   
-    const postData =  await postModel.getPaginatedPosts(startIndex, pageSize);
-    if(!postData){
-        return res.json(responseFormatter(false, ERROR_CODES.GET_POST_ERROR, null));  
+
+    const postData = await postModel.getPaginatedPosts(startIndex, pageSize);
+
+    if (!postData) {
+        return res.json(responseFormatter(false, ERROR_CODES.GET_POST_ERROR, null));
     }
-    return res.json(responseFormatter(true, 'get_posts_success', { postData }));
-})
+
+    // 데이터가 없으면 success와 함께 빈 배열로 응답
+    const hasMore = postData.length === pageSize; // 남은 게시물이 있는지 여부
+    return res.json(responseFormatter(true, 'get_posts_success', { postData, hasMore }));
+});
+
 
 
 //NOTE: 게시글 + 댓글 조회
