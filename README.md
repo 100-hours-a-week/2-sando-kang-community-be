@@ -36,7 +36,82 @@
 
 </p>
 
+## 3. 데이터베이스
+![image](https://github.com/user-attachments/assets/8d8e1d8b-88b4-473b-bb66-3167a59fbf70)
 
+## 4. 사용법
+ - 테이블 생성
+    
+    ```sql
+        -- 데이터베이스명.`user` definition
+
+        CREATE TABLE `user` (
+          `id` int NOT NULL AUTO_INCREMENT,
+          `email` varchar(30) NOT NULL,
+          `password` varchar(30) NOT NULL,
+          `nickname` varchar(10) DEFAULT NULL,
+          `profile` longblob,
+          PRIMARY KEY (`id`),
+          UNIQUE KEY `email` (`email`)
+        ) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+        
+        -- 데이터베이스명.post definition
+        
+        CREATE TABLE `post` (
+          `id` int NOT NULL AUTO_INCREMENT,
+          `user_id` int NOT NULL,
+          `title` varchar(26) NOT NULL,
+          `content` text NOT NULL,
+          `image` longblob,
+          `date` datetime NOT NULL,
+          `likes` int DEFAULT '1',
+          `comments` int DEFAULT '1',
+          `views` int DEFAULT '1',
+          PRIMARY KEY (`id`),
+          KEY `user_id` (`user_id`),
+          CONSTRAINT `post_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE
+        ) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+        -- 데이터베이스명.sessions definition
+
+        CREATE TABLE `sessions` (
+          `session_id` varchar(128) NOT NULL,
+          `expires` int unsigned NOT NULL,
+          `data` text,
+          PRIMARY KEY (`session_id`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+    
+        -- kakao.comment definition
+
+        CREATE TABLE `comment` (
+          `id` int NOT NULL AUTO_INCREMENT,
+          `post_id` int NOT NULL,
+          `user_id` int NOT NULL,
+          `comment` varchar(30) DEFAULT NULL,
+          `date` datetime NOT NULL,
+          PRIMARY KEY (`id`),
+          KEY `user_id` (`user_id`),
+          KEY `post_id` (`post_id`),
+          CONSTRAINT `comment_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE,
+          CONSTRAINT `comment_ibfk_2` FOREIGN KEY (`post_id`) REFERENCES `post` (`id`) ON DELETE CASCADE
+        ) ENGINE=InnoDB AUTO_INCREMENT=26 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+    
+    
+    ```
+- .env 파일 작성
+   ``` env
+        DB_HOST=xxx  // 호스트명         
+        DB_USER=xxx  // 사용자명            
+        DB_PASSWORD=xxx // 비밀번호
+        DB_NAME=xxx     // 데이터베이스명 
+  ```     
+
+- 구동
+    ``` javascript
+        node app.js
+   ```
 --------------------------------------------------------------------------------------------
   ### github 키워드
 
