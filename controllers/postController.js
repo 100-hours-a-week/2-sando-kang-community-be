@@ -16,9 +16,9 @@ exports.getPosts = asyncHandler(async (req, res) => {
    
     const postData =  await postModel.getPaginatedPosts(startIndex, pageSize);
     if(!postData){
-        res.json(responseFormatter(false, ERROR_CODES.GET_POST_ERROR, null));  
+        return res.json(responseFormatter(false, ERROR_CODES.GET_POST_ERROR, null));  
     }
-    res.json(responseFormatter(true, 'get_posts_success', { postData }));
+    return res.json(responseFormatter(true, 'get_posts_success', { postData }));
 })
 
 
@@ -28,7 +28,7 @@ exports.getPostsById = asyncHandler(async (req, res, next) => {
 
     const post = await postModel.getPostById(postId);
     if (!post) {
-        res.json(responseFormatter(false, ERROR_CODES.GET_POST_ERROR, null));  
+        return res.json(responseFormatter(false, ERROR_CODES.GET_POST_ERROR, null));  
     }
 
     const user = await authModel.findUserById(post.user_id);
@@ -61,8 +61,7 @@ exports.getPostsById = asyncHandler(async (req, res, next) => {
         commentsCnt: post.comments,
         comment: formattedComments,
     };
-
-    res.json(responseFormatter(true, 'get_posts_succcess', { postData }));
+    return res.json(responseFormatter(true, 'get_posts_succcess', { postData }));
 });
 
 //NOTE: 게시글 작성
@@ -79,9 +78,9 @@ exports.createPost = asyncHandler(async (req, res, next) => {
 
     const postId = await postModel.createPost(user_id, title, content, image, date);
     if (!postId) {
-        res.json(responseFormatter(false, ERROR_CODES.CREATE_POST_ERROR, null));  
+        return res.json(responseFormatter(false, ERROR_CODES.CREATE_POST_ERROR, null));  
     }
-    res.json(responseFormatter(true, 'create_post_success', { postId }));
+    return res.json(responseFormatter(true, 'create_post_success', { postId }));
 });
 
 //NOTE: 특정 게시글 조회
@@ -96,10 +95,9 @@ exports.getPostById = asyncHandler(async (req, res, next) => {
 
     const post = await postModel.getPostById(user_id, post_id);
     if (!post || !post.length) {
-        res.json(responseFormatter(false, ERROR_CODES.GET_POST_ERROR, null));  
+        return res.json(responseFormatter(false, ERROR_CODES.GET_POST_ERROR, null));  
     }
-
-    res.json(responseFormatter(true, 'get_post_success', { post: post[0] }));
+    return res.json(responseFormatter(true, 'get_post_success', { post: post[0] }));
 });
 
 //NOTE: 게시글 수정
@@ -115,10 +113,10 @@ exports.updatePost = asyncHandler(async (req, res, next) => {
 
     const result = await postModel.updatePost(user_id, post_id, title, content, image, date);
     if (!result) {
-        res.json(responseFormatter(false, ERROR_CODES.UPDATE_POST_ERROR, null));  
+        return res.json(responseFormatter(false, ERROR_CODES.UPDATE_POST_ERROR, null));  
     }
 
-    res.json(responseFormatter(true, 'update_post_success'));
+    return res.json(responseFormatter(true, 'update_post_success'));
 });
 
 // NOTE: 게시글 삭제
@@ -133,15 +131,14 @@ exports.deletePost = asyncHandler(async (req, res, next) => {
 
     const postResult = await postModel.deletePost(post_id);
     if (!postResult) {
-        res.json(responseFormatter(false, ERROR_CODES.DELETE_POST_ERROR, null));  
+        return res.json(responseFormatter(false, ERROR_CODES.DELETE_POST_ERROR, null));  
     }
 
     const commentResult = await commentModel.deleteCommentByPostId(post_id);
     if (!commentResult) {
-        res.json(responseFormatter(false, ERROR_CODES.DELETE_POST_COMMENT_ERROR, null));  
+        return res.json(responseFormatter(false, ERROR_CODES.DELETE_POST_COMMENT_ERROR, null));  
     }
-
-    res.json(responseFormatter(true, 'delete_post_success'));
+    return res.json(responseFormatter(true, 'delete_post_success'));
 });
 
 // NOTE: 게시글 좋아요+1
@@ -156,8 +153,7 @@ exports.patchPost = asyncHandler(async (req, res, next) => {
 
     const result = await postModel.patchPost(post_id);
     if (!result) {
-        res.json(responseFormatter(false, ERROR_CODES.UPDATE_POST_ERROR, null));  
+        return res.json(responseFormatter(false, ERROR_CODES.UPDATE_POST_ERROR, null));  
     }
-
-    res.json(responseFormatter(true, 'update_post_success'));
+    return res.json(responseFormatter(true, 'update_post_success'));
 });
