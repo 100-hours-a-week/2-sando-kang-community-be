@@ -83,7 +83,7 @@
           PRIMARY KEY (`session_id`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
     
-        -- kakao.comment definition
+        -- 데이터베이스명.comment definition
 
         CREATE TABLE `comment` (
           `id` int NOT NULL AUTO_INCREMENT,
