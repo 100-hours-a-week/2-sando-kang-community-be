@@ -58,7 +58,6 @@ exports.updateComment = asyncHandler(async (req, res, next) => {
             return res.json(responseFormatter(false, ERROR_CODES.MISSING_FIELDS(key), null));
         }
     }
-
     const result = await commentModel.updateComment(comment_id, content);
     if (!result) {
         if(!addReply){

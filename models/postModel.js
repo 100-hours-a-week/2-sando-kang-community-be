@@ -98,6 +98,7 @@ exports.discountComment = (post_id) => {
 
 // NOTE: 게시글 좋아요
 exports.patchPost = (post_id) => {
+    console.log(`id : ${post_id}`)
     const query = `UPDATE post SET likes = likes + 1 WHERE id = ?`;
     return new Promise((resolve, reject) => {
         connection.query(query, [post_id], (err, results) => {
