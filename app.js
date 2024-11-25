@@ -13,6 +13,13 @@ const fs = require('fs');
 const db = require('./db/db');
 const globalErrorHandler = require('./middleware/globalErrorHandler');
 
+const dotenv = require('dotenv');
+
+// NODE_ENV에 따라 환경 파일 로드
+const env = process.env.NODE_ENV || 'local'; 
+dotenv.config({ path: `.env.${env}` });
+console.log(`Loaded environment: ${env}`);
+
 
 const app = express();
 const PORT = 3000;
@@ -108,7 +115,7 @@ app.get('/privacy', (req, res) => {
 
 // 서버 실행
 app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+  console.log(`Server is running on ${PORT}`);
 });
 
 // 타임아웃 핸들러
