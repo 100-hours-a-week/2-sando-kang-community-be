@@ -50,7 +50,8 @@ exports.getPostsById = asyncHandler(async (req, res, next) => {
 
     let imageUrl = null;
     if (post.image) {
-        imageUrl = `${process.env.BASE_URL || 'http://127.0.0.1:3000'}/${post.image}`;
+        const baseUrl = process.env.BASE_URL || 'http://127.0.0.1:3000';
+        imageUrl = post.image ? `${baseUrl}/${post.image}` : null;
     }
 
     const postData = {
