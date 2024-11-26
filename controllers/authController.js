@@ -62,20 +62,32 @@ exports.signin = asyncHandler(async (req, res, next) => {
   const { email, password, nickname } = req.body;
   const profile = req.file ? req.file.path : null;
 
+  console.log(`email : ${email}`);
+  console.log(`password : ${password}`);
+  console.log(`nickname : ${nickname}`);
+  console.log(`profile : ${profile}`);
+
   for (const key in req.body) {
     if (!req.body[key]) {
         return res.json(responseFormatter(false, ERROR_CODES.MISSING_FIELDS(key), null));
       }
   }
-
   const encodedPassword = base64.encode(password);
-  const createUser = await authModel.createUser(email, encodedPassword, nickname, profile);
-  if(!createUser) {
-    return res.json(responseFormatter(false, ERROR_CODES.CREATE_USER_ERROR, null));
-  }
+ 
+  try {
+    const createUser = await authModel.createUser(email, encodedPassword, nickname, profile);
 
-  req.session.user = { email, nickname, profile };
-  return res.json(responseFormatter(true, 'signin_success'));
+    if (!createUser) {
+      console.error('User creation failed.');
+      return res.json(responseFormatter(false, ERROR_CODES.CREATE_USER_ERROR, null));
+    }
+  
+    req.session.user = { email, nickname, profile };
+    return res.json(responseFormatter(true, 'signin_success'));
+  } catch (error) {
+    console.error('Error during user creation:', error.message);
+    return res.status(500).json(responseFormatter(false, 'internal_server_error', null));
+  }
 });
 
 // NOTE: 회원 탈퇴
