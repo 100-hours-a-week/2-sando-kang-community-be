@@ -4,4 +4,4 @@
 export NODE_ENV=dev
 
 # 서버 실행
-node app.js
+pm2 start app.js --name "my-app" --env dev
