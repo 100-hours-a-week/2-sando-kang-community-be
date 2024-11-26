@@ -52,14 +52,14 @@ app.use(
 );
 
 app.use(express.json());
-app.use(timeout('15s'));
+app.use(timeout('30s'));
 app.use(haltOnTimedout);
 app.use(limiter);
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use(globalErrorHandler);
 
 const corsOptions = {
-  origin: ['http://127.0.0.1:5501', 'http://43.202.140.0'],
+  origin: ['http://127.0.0.1:5501', 'http://localhost:3001', 'http://43.202.140.0'],
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true, 
 };
