@@ -53,6 +53,16 @@ exports.getPostById = (postId) => {
 };
 
 // NOTE: 게시글 수정
+exports.findPostByUserId = (user_id) => {
+    const query = `SELECT * FROM post where user_id = ?`;
+    return new Promise((resolve, reject) => {
+        connection.query(query, [user_id], (err, results) => {
+            if (err) return reject(err);
+            resolve(results);
+        });
+    });
+};
+
 exports.updatePost = (user_id, post_id, title, content, image, date) => {
     const query = `UPDATE post SET title = ?, content = ?, image = ?, date = ? WHERE user_id = ? AND id = ?`;
     return new Promise((resolve, reject) => {

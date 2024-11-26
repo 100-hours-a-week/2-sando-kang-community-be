@@ -15,11 +15,6 @@ const globalErrorHandler = require('./middleware/globalErrorHandler');
 
 const dotenv = require('dotenv');
 
-// NODE_ENV에 따라 환경 파일 로드
-const env = process.env.NODE_ENV || 'local'; 
-dotenv.config({ path: `.env.${env}` });
-console.log(`Loaded environment: ${env}`);
-
 
 const app = express();
 const PORT = 3000;
@@ -64,7 +59,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use(globalErrorHandler);
 
 const corsOptions = {
-  origin: ['http://43.202.140.0'],
+  origin: ['http://127.0.0.1:5501', 'http://43.202.140.0'],
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true, 
 };
