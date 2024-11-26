@@ -16,6 +16,19 @@ exports.getPosts = asyncHandler(async (req, res) => {
 
     const postData = await postModel.getPaginatedPosts(startIndex, pageSize);
 
+    for(i = 0 ; i < postData.length ; i++){
+        if(postData[i].profile){
+            const baseUrl = process.env.BASE_URL || 'http://127.0.0.1:3000';
+            imageUrl = postData[i].profile ? `${baseUrl}/${postData[i].profile}` : null;
+            postData[i].profile = imageUrl;
+        }
+        if(postData[i].image){
+            const baseUrl = process.env.BASE_URL || 'http://127.0.0.1:3000';
+            imageUrl = postData[i].image ? `${baseUrl}/${postData[i].image}` : null;
+            postData[i].image = imageUrl;
+        }
+    }
+
     if (!postData) {
         return res.json(responseFormatter(false, ERROR_CODES.GET_POST_ERROR, null));
     }
@@ -38,8 +51,7 @@ exports.getPostsById = asyncHandler(async (req, res, next) => {
 
     const user = await authModel.findUserById(post.user_id);
     const author = user ? user.nickname : 'Unknown';
-    const profileImg = user ? user.profile : 'default.png';
-
+   
     const comments = await commentModel.findCommentsByPostId(postId);
     const formattedComments = comments.map((comment) => ({
         id: comment.id,
@@ -47,6 +59,12 @@ exports.getPostsById = asyncHandler(async (req, res, next) => {
         author: comment.author || 'Unknown',
         date: comment.date,
     }));
+
+    let profileUrl = null;
+    if (user.profile) {
+        const baseUrl = process.env.BASE_URL || 'http://127.0.0.1:3000';
+        profileUrl = user.profile ? `${baseUrl}/${user.profile}` : null;
+    }
 
     let imageUrl = null;
     if (post.image) {
@@ -61,7 +79,7 @@ exports.getPostsById = asyncHandler(async (req, res, next) => {
         updatePostDate: post.date,
         image: imageUrl,
         author: author,
-        profile: profileImg,
+        profile: profileUrl,
         likesCnt: post.likes,
         viewsCnt: post.views,
         commentsCnt: post.comments,
@@ -118,6 +136,16 @@ exports.updatePost = asyncHandler(async (req, res, next) => {
         }
     }
 
+    console.log(`userid : ${user_id}`);
+    console.log(`post_id : ${post_id}`);
+    console.log(`title : ${title}`);
+    console.log(`content : ${content}`);
+    console.log(`date : ${date}`);
+    console.log(`image : ${image}`);
+
+    const post = await postModel.findPostByUserId(user_id);
+    if (post == null)  return res.json(responseFormatter(false, ERROR_CODES.GET_POST_ERROR, null));  
+    
     const result = await postModel.updatePost(user_id, post_id, title, content, image, date);
     if (!result) {
         return res.json(responseFormatter(false, ERROR_CODES.UPDATE_POST_ERROR, null));  
