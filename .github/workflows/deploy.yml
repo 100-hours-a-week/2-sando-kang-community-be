@@ -81,8 +81,8 @@ jobs:
         with:
           aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          application_name: Project-dev
-          environment_name: Project-dev-env
+          application_name: community-project
+          environment_name: Community-project-env
           region: ap-northeast-2
           deployment_package: dist/deploy.zip
           use_existing_version_if_available: true
