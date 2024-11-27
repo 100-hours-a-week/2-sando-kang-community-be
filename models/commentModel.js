@@ -62,7 +62,7 @@ exports.deleteComment = async (comment_id) => {
 
   try {
     const [result] = await connection.query(query, [comment_id]);
-    return result.affectedRows > 0; // 삭제 성공 여부 반환
+    return result.affectedRows > 0; 
   } catch (error) {
     console.error('Error deleting comment:', error.message);
     throw error;
@@ -75,7 +75,7 @@ exports.deleteCommentByPostId = async (post_id) => {
 
   try {
     const [result] = await connection.query(query, [post_id]);
-    return result.affectedRows > 0; // 삭제 성공 여부 반환
+    return result.affectedRows > 0; 
   } catch (error) {
     console.error('Error deleting comments by post ID:', error.message);
     throw error;

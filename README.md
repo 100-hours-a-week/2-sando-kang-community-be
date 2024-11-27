@@ -100,7 +100,7 @@
     
     
     ```
-- .env 파일 작성
+- .env.local 파일 작성
    ``` env
         DB_HOST=xxx  // 호스트명         
         DB_USER=xxx  // 사용자명            

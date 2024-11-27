@@ -1,6 +1,6 @@
 const connection = require('../db/db');
 
-// 이메일로 사용자 찾기
+// NOTE: 이메일로 사용자 찾기
 exports.findUserByEmail = async (email) => {
   const query = 'SELECT * FROM user WHERE email = ?';
   try {
@@ -12,7 +12,7 @@ exports.findUserByEmail = async (email) => {
   }
 };
 
-// 사용자 ID로 사용자 찾기
+// NOTE: 사용자 ID로 사용자 찾기
 exports.findUserById = async (user_id) => {
   const query = 'SELECT * FROM user WHERE id = ?';
   try {
@@ -27,7 +27,7 @@ exports.findUserById = async (user_id) => {
   }
 };
 
-// 사용자 생성
+// NOTE: 사용자 생성
 exports.createUser = async (email, password, nickname, profile) => {
   const query = `INSERT INTO user (email, password, nickname, profile) VALUES (?, ?, ?, ?)`;
   try {
@@ -39,7 +39,7 @@ exports.createUser = async (email, password, nickname, profile) => {
   }
 };
 
-// 사용자 삭제
+// NOTE: 사용자 삭제
 exports.deleteUser = async (user_id) => {
   const query = 'DELETE FROM user WHERE id = ?';
   try {
@@ -51,7 +51,7 @@ exports.deleteUser = async (user_id) => {
   }
 };
 
-// 닉네임 업데이트
+// NOTE: 닉네임 업데이트
 exports.updateNickname = async (user_id, nickname, profile) => {
   const query = 'UPDATE user SET nickname = ? , profile = ? WHERE id = ?';
   try {
@@ -63,7 +63,7 @@ exports.updateNickname = async (user_id, nickname, profile) => {
   }
 };
 
-// 비밀번호 업데이트
+// NOTE: 비밀번호 업데이트
 exports.updatePassword = async (user_id, password) => {
   const query = 'UPDATE user SET password = ? WHERE id = ?';
   try {
