@@ -30,7 +30,7 @@ exports.login = asyncHandler(async (req, res, next) => {
   if(user.profile){
     const baseUrl = process.env.BASE_URL || 'http://127.0.0.1:3000';
     profileUrl = user.profile ? `${baseUrl}/${user.profile}` : null;
-}
+  }
 
   // 세션 저장
   req.session.user = {
@@ -104,15 +104,32 @@ exports.withdraw = asyncHandler(async (req, res, next) => {
 
 // NOTE: 닉네임 수정
 exports.updateNickname = asyncHandler(async (req, res, next) => {
-  const { user_id } = req.body;
+  const { user_id, nickname} = req.body;
 
-  validateFields(['user_id'], req.body);
+  const profile = req.file ? req.file.path : null;
 
-  const updateUser = await authModel.updateNickname(user_id, nickname);
+  console.log(`id: ${user_id}`);
+  console.log(`nickname: ${nickname}`);
+
+  validateFields(['user_id', 'nickname'], req.body);
+
+  const updateUser = await authModel.updateNickname(user_id, nickname, profile);
   if(!updateUser) {
-    return res.json(responseFormatter(fasle, ERROR_CODES.UPDATE_USER_ERROR, null));
+    return res.json(responseFormatter(false, ERROR_CODES.UPDATE_USER_ERROR, null));
+  }else{
+    let profileUrl ;
+    if(profile){
+      const baseUrl = process.env.BASE_URL || 'http://127.0.0.1:3000';
+      profileUrl = profile ? `${baseUrl}/${profile}` : null;
+    }
+    const responseData = {
+      user_id: user_id,
+      nickname: nickname,
+      profile: profileUrl,
+    };
+    console.log(responseData);
+    return res.json(responseFormatter(true, 'update_success', responseData));
   }
-  return res.json(responseFormatter(true, 'update_success'));
 });
 
 // NOTE: 비밀번호 수정
