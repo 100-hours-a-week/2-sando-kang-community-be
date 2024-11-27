@@ -4,16 +4,15 @@ const authModel = require('../models/authModel');
 const responseFormatter = require('../util/ResponseFormatter');
 const base64 = require('base-64');
 const session = require('express-session')
+const validateFields = require('../util/validateFields');
+
 
 // NOTE: 로그인
 exports.login = asyncHandler(async (req, res, next) => {
   const { email, password } = req.body;
 
-  for (const key in req.body) {
-    if (!req.body[key]) {
-        return res.json(responseFormatter(false, ERROR_CODES.MISSING_FIELDS(key), null));
-    }
-}
+  validateFields(['email', 'password'], req.body);
+
 
   const encodedPassword = base64.encode(password);
 
@@ -70,16 +69,8 @@ exports.signin = asyncHandler(async (req, res, next) => {
   const { email, password, nickname } = req.body;
   const profile = req.file ? req.file.path : null;
 
-  console.log(`email : ${email}`);
-  console.log(`password : ${password}`);
-  console.log(`nickname : ${nickname}`);
-  console.log(`profile : ${profile}`);
+  validateFields(['email', 'password', 'nickname'], req.body);
 
-  for (const key in req.body) {
-    if (!req.body[key]) {
-        return res.json(responseFormatter(false, ERROR_CODES.MISSING_FIELDS(key), null));
-      }
-  }
   const encodedPassword = base64.encode(password);
  
   try {
@@ -102,12 +93,8 @@ exports.signin = asyncHandler(async (req, res, next) => {
 exports.withdraw = asyncHandler(async (req, res, next) => {
   const { user_id } = req.body;
 
-  for (const key in req.body) {
-    if (!req.body[key]) {
-        return res.json(responseFormatter(false, ERROR_CODES.MISSING_FIELDS(key), null));
-    }
-}
-
+  validateFields(['user_id'], req.body);
+  
   const deleteUser = await authModel.deleteUser(user_id);
   if(!deleteUser) {
     return res.json(responseFormatter(false, ERROR_CODES.DELETE_USER_ERROR, null));
@@ -117,13 +104,9 @@ exports.withdraw = asyncHandler(async (req, res, next) => {
 
 // NOTE: 닉네임 수정
 exports.updateNickname = asyncHandler(async (req, res, next) => {
-  const { user_id, nickname } = req.body;
+  const { user_id } = req.body;
 
-  for (const key in req.body) {
-    if (!req.body[key]) {
-        return res.json(responseFormatter(false, ERROR_CODES.MISSING_FIELDS(key), null));
-    }
-}
+  validateFields(['user_id'], req.body);
 
   const updateUser = await authModel.updateNickname(user_id, nickname);
   if(!updateUser) {
@@ -136,11 +119,7 @@ exports.updateNickname = asyncHandler(async (req, res, next) => {
 exports.updatePassword = asyncHandler(async (req, res, next) => {
   const { user_id, password } = req.body;
 
-  for (const key in req.body) {
-    if (!req.body[key]) {
-        return res.json(responseFormatter(false, ERROR_CODES.MISSING_FIELDS(key), null));
-    }
-}
+  validateFields(['user_id', 'password'], req.body);
 
   const encodedPassword = base64.encode(password);
   const updatePassword = await authModel.updatePassword(user_id, encodedPassword);

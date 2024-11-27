@@ -5,6 +5,8 @@ const postModel = require('../models/postModel');
 const authModel = require('../models/authModel');
 const commentModel = require('../models/commentModel');
 
+const validateFields = require('../util/validateFields');
+
 //NOTE: posts.js 연동 - 게시글 목록 조회
 exports.getPosts = asyncHandler(async (req, res) => {
     const page = parseInt(req.query.page) || 1;
@@ -43,6 +45,8 @@ exports.getPosts = asyncHandler(async (req, res) => {
 //NOTE: 게시글 + 댓글 조회
 exports.getPostsById = asyncHandler(async (req, res, next) => {
     const { postId } = req.params;
+
+    validateFields(['postId'], req.body);
 
     const post = await postModel.getPostById(postId);
     if (!post) {
@@ -95,11 +99,7 @@ exports.createPost = asyncHandler(async (req, res, next) => {
     const image = req.file ? req.file.path : null;
     const date = new Date().toISOString().slice(0, 19).replace('T', ' ');
 
-    for (const key in req.body) {
-        if (!req.body[key]) {
-            return res.json(responseFormatter(false, ERROR_CODES.MISSING_FIELDS(key), null));
-        }
-    }
+    validateFields(['user_id', 'title' , 'content'], req.body);
 
     const postId = await postModel.createPost(user_id, title, content, image, date);
     if (!postId) {
@@ -112,11 +112,7 @@ exports.createPost = asyncHandler(async (req, res, next) => {
 exports.getPostById = asyncHandler(async (req, res, next) => {
     const { user_id, post_id } = req.query;
 
-    for (const key in req.body) {
-        if (!req.body[key]) {
-            return res.json(responseFormatter(false, ERROR_CODES.MISSING_FIELDS(key), null));
-        }
-    }
+    validateFields(['user_id', 'post_id'], req.body);
 
     const post = await postModel.getPostById(user_id, post_id);
     if (!post || !post.length) {
@@ -130,18 +126,7 @@ exports.updatePost = asyncHandler(async (req, res, next) => {
     const { user_id, post_id, title, content, date } = req.body;
     const image = req.file ? req.file.path : null;
 
-    for (const key in req.body) {
-        if (!req.body[key]) {
-            return res.json(responseFormatter(false, ERROR_CODES.MISSING_FIELDS(key), null));
-        }
-    }
-
-    console.log(`userid : ${user_id}`);
-    console.log(`post_id : ${post_id}`);
-    console.log(`title : ${title}`);
-    console.log(`content : ${content}`);
-    console.log(`date : ${date}`);
-    console.log(`image : ${image}`);
+    validateFields(['user_id', 'post_id', 'title', 'content', 'date'], req.body);
 
     const post = await postModel.findPostByUserId(user_id);
     if (post == null)  return res.json(responseFormatter(false, ERROR_CODES.GET_POST_ERROR, null));  
@@ -158,11 +143,7 @@ exports.updatePost = asyncHandler(async (req, res, next) => {
 exports.deletePost = asyncHandler(async (req, res, next) => {
     const { post_id } = req.body;
 
-    for (const key in req.body) {
-        if (!req.body[key]) {
-            return res.json(responseFormatter(false, ERROR_CODES.MISSING_FIELDS(key), null));
-        }
-    }
+    validateFields(['post_id'], req.body);
 
     const postResult = await postModel.deletePost(post_id);
     if (!postResult) {
@@ -180,11 +161,7 @@ exports.deletePost = asyncHandler(async (req, res, next) => {
 exports.patchPost = asyncHandler(async (req, res, next) => {
     const { post_id } = req.body;
 
-    for (const key in req.body) {
-        if (!req.body[key] || req.body[key] == null) {
-            return res.json(responseFormatter(false, ERROR_CODES.MISSING_FIELDS(key), null));
-        }
-    }
+    validateFields(['post_id'], req.body);
 
     const result = await postModel.patchPost(post_id);
     if (!result) {

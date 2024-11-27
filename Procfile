@@ -1,1 +1,1 @@
-web: npm install & sh ./start.sh
+web: sh ./start.sh
