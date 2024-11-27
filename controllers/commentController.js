@@ -4,15 +4,14 @@ const commentModel = require('../models/commentModel');
 const postModel = require('../models/postModel');
 const responseFormatter = require('../util/ResponseFormatter');
 
+const validateFields = require('../util/validateFields');
+
+
 //NOTE: 댓글 목록 조회
 exports.getCommentsByPostId = asyncHandler(async (req, res) => {
     const { postId } = req.params;
 
-    for (const key in req.body) {
-        if (!req.body[key]) {
-            return res.json(responseFormatter(false, ERROR_CODES.MISSING_FIELDS(key), null));
-        }
-    }
+    validateFields(['postId'], req.body);
 
     const comments = await commentModel.getCommentsByPostId(postId); 
 
@@ -31,11 +30,7 @@ exports.getCommentsByPostId = asyncHandler(async (req, res) => {
 exports.createComment = asyncHandler(async (req, res, next) => {
     const { user_id, post_id, comment, date } = req.body;
 
-    for (const key in req.body) {
-    if (!req.body[key]) {
-        return res.json(responseFormatter(false, ERROR_CODES.MISSING_FIELDS(key), null));
-        }
-    }
+    validateFields(['user_id', 'post_id', 'comment', 'date'], req.body);
 
     const createComment = await commentModel.createComment(user_id, post_id, comment, date);
     if(!createComment) {
@@ -53,11 +48,8 @@ exports.createComment = asyncHandler(async (req, res, next) => {
 exports.updateComment = asyncHandler(async (req, res, next) => {
     const { comment_id, content } = req.body;
 
-    for (const key in req.body) {
-        if (!req.body[key]) {
-            return res.json(responseFormatter(false, ERROR_CODES.MISSING_FIELDS(key), null));
-        }
-    }
+    validateFields(['comment_id', 'content'], req.body);
+
     const result = await commentModel.updateComment(comment_id, content);
     if (!result) {
         if(!addReply){
@@ -71,11 +63,7 @@ exports.updateComment = asyncHandler(async (req, res, next) => {
 exports.deleteComment = asyncHandler(async (req, res, next) => {
     const { comment, post_id } = req.body;
 
-    for (const key in req.body) {
-        if (!req.body[key]) {
-            return res.json(responseFormatter(false, ERROR_CODES.MISSING_FIELDS(key), null));
-        }
-    }
+    validateFields(['comment', 'post_id'], req.body);
 
     const deleteResult = await commentModel.deleteComment(comment);
     if (!deleteResult) {

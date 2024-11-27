@@ -23,7 +23,7 @@ exports.findCommentsByPostId = async (postId) => {
     if (rows.length === 0) {
       console.log('No comments found for post ID:', postId);
     }
-    return rows; // 댓글 리스트 반환 (없으면 빈 배열 반환)
+    return rows;
   } catch (error) {
     console.error('Error fetching comments by post ID:', error.message);
     throw error;
@@ -36,7 +36,7 @@ exports.createComment = async (user_id, post_id, comment, date) => {
 
   try {
     const [result] = await connection.query(query, [user_id, post_id, comment, date]);
-    return result.insertId; // 삽입된 댓글 ID 반환
+    return result.insertId;
   } catch (error) {
     console.error('Error creating comment:', error.message);
     throw error;
@@ -49,7 +49,7 @@ exports.updateComment = async (comment_id, content) => {
 
   try {
     const [result] = await connection.query(query, [content, comment_id]);
-    return result.affectedRows > 0; // 수정 성공 여부 반환
+    return result.affectedRows > 0; 
   } catch (error) {
     console.error('Error updating comment:', error.message);
     throw error;

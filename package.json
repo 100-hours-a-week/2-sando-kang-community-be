@@ -32,9 +32,10 @@
     "rotating-file-stream": "^3.2.5"
   },
   "devDependencies": {
+    "@babel/preset-env": "^7.26.0",
+    "babel-loader": "^9.2.1",
     "webpack": "^5.96.1",
     "webpack-cli": "^5.1.4",
     "webpack-node-externals": "^3.0.0"
   }
-  
 }
