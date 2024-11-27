@@ -99,10 +99,12 @@ app.use(
 const authRouter = require('./routes/authRoutes');
 const postRouter = require('./routes/postRoutes');
 const commentRouter = require('./routes/commentRoutes');
+const healthRouter = require('./routes/healthRoutes');
 
 app.use('/api/auth', authRouter);
 app.use('/api/post', postRouter);
 app.use('/api/comment', commentRouter);
+app.use('/health', healthRouter);
 
 app.get('/', (req, res) => {
   res.send('Hello, Express!');
