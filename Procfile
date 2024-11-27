@@ -1,0 +1,1 @@
+web: npm install & sh ./start.sh
