@@ -2,101 +2,50 @@ name: Node.js Dev CI/CD
 
 on:
   push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+    branches:
+      - main
 
 jobs:
   build:
-    if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main'
-    
     runs-on: ubuntu-latest  
 
-    strategy:
-      matrix:
-        node-version: ['18.x']  
-        
     steps:
-      - uses: actions/checkout@v4
-      # Node.js 세팅
-      - name: Set up Node.js ${{ matrix.node-version }}
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: '18.x'
           cache: 'npm'
 
-      - name: Install Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v3
-        with:
-          node-version: ${{ matrix.node-version }}
+      - name: Install dependencies
+        run: npm ci
 
-
-      # Download AWS CLI 2
-      - name: Install AWS CLI 2
-        run: |
-          curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-          unzip awscliv2.zip
-          which aws
-          sudo ./aws/install --bin-dir /usr/local/bin --install-dir /usr/local/aws-cli --update
-          
-      # Configure AWS credentials
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACTION_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_ACTION_SECRET_ACCESS_KEY }}
-          aws-region: ap-northeast-2
-
-      # npm install for ci
-      - run: |
-          npm install
-          npm install moment-timezone
-
-
-      # Build
-      - run: npm run build
-      # Unit test
-      #- run: npm run test:unit
+      - name: Build project
+        run: npm run build
 
       - name: Generate deployment package
         run: |
-          cp -R .platform dist
-          cp package.json dist/package.json
-          cp package-lock.json dist/package-lock.json
-          cp Procfile dist/Procfile
-          cp -r swagger dist
+          mkdir dist
+          cp -R .platform dist/
+          cp package.json dist/
+          cp package-lock.json dist/
+          cp Procfile dist/
           cd dist
           zip -r deploy.zip .
-          
-      - name: Get Zip Inside
-        run: zipinfo -1 dist/deploy.zip
 
-      # 현재 시간 얻기 (Build 시점의 시간 얻기)
-      - name: Get current time
-        uses: 1466587594/get-current-time@v2
-        id: current-time
-        with:
-          format: YYYY-MM-DDTHH-mm-ss
-          utcOffset: "+09:00" # 한국 시간 고려
-
-      # 현재 시간 출력 (위에서 얻은 build 시점의 시간 보여주기)
-      - name: Show Current Time
-        run: echo "CurrentTime=${{steps.current-time.outputs.formattedTime}}"
-        shell: bash 
-
-      # Deploy to Elastic Beanstalk
-      - name: Deploy to EB
+      - name: Deploy to Elastic Beanstalk
         uses: einaregilsson/beanstalk-deploy@v22
         with:
-          aws_access_key: ${{secrets.AWS_ACTION_ACCESS_KEY_ID}}
-          aws_secret_key: ${{secrets.AWS_ACTION_SECRET_ACCESS_KEY}}
-          application_name: Project-dev
-          environment_name: Project-dev-env
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          application_name: community-project
+          environment_name: Community-project-env
           region: ap-northeast-2
           deployment_package: dist/deploy.zip
-          use_existing_version_if_available: true
-          version_label: github-action-${{ steps.current-time.outputs.formattedTime }}
-          wait_for_deployment: false
+          version_label: deploy-${{ github.sha }}
+          wait_for_deployment: true
 
-      - name: Deployed!
-        run: echo App deployed to ELB
+      - name: Deployment complete
+        run: echo "Deployment finished!"
