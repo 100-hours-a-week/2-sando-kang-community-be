@@ -52,10 +52,10 @@ exports.deleteUser = async (user_id) => {
 };
 
 // 닉네임 업데이트
-exports.updateNickname = async (user_id, nickname) => {
-  const query = 'UPDATE user SET nickname = ? WHERE id = ?';
+exports.updateNickname = async (user_id, nickname, profile) => {
+  const query = 'UPDATE user SET nickname = ? , profile = ? WHERE id = ?';
   try {
-    const [result] = await connection.query(query, [nickname, user_id]);
+    const [result] = await connection.query(query, [nickname, profile, user_id]);
     return result.affectedRows > 0; 
   } catch (error) {
     console.error('Database Update Error (updateNickname):', error.message);
