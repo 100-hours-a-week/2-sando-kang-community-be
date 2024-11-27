@@ -4,13 +4,8 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "build": "webpack --mode production",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start:dev": "nodemon --exec babel-node index.js",
-    "start:dist": "webpack --mode production & node ./dist/main.js",
-    "start": "node main.cjs"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "type": "module",
   "keywords": [],
   "author": "",
   "license": "ISC",
