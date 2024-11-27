@@ -27,19 +27,27 @@ exports.login = asyncHandler(async (req, res, next) => {
     return res.json(responseFormatter(false, ERROR_CODES.INVALID_PASSWORD, null));  
   }
 
+  let profileUrl ;
+  if(user.profile){
+    const baseUrl = process.env.BASE_URL || 'http://127.0.0.1:3000';
+    profileUrl = user.profile ? `${baseUrl}/${user.profile}` : null;
+}
+
   // 세션 저장
   req.session.user = {
       user_id: user.id,
       email: user.email,
       nickname: user.nickname,
-      profile: user.profile,
+      profile: profileUrl,
   };
+
+  console.log(profileUrl);
 
   const responseData = {
       user_id: user.id,
       email: user.email,
       nickname: user.nickname,
-      profile: user.profile,
+      profile: profileUrl,
   };
 
   res.setHeader('Access-Control-Allow-Origin', '*');
