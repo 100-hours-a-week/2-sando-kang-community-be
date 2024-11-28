@@ -46,7 +46,7 @@ exports.getPosts = asyncHandler(async (req, res) => {
 exports.getPostsById = asyncHandler(async (req, res, next) => {
     const { postId } = req.params;
 
-    validateFields(['postId'], req.body);
+    validateFields(['postId'], req.params);
 
     const post = await postModel.getPostById(postId);
     if (!post) {
