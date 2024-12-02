@@ -13,9 +13,6 @@ const fs = require('fs');
 const db = require('./db/db');
 const globalErrorHandler = require('./middleware/globalErrorHandler');
 
-const dotenv = require('dotenv');
-
-
 const app = express();
 const PORT = 3000;
 
@@ -104,7 +101,6 @@ const healthRouter = require('./routes/healthRoutes');
 app.use('/api/auth', authRouter);
 app.use('/api/post', postRouter);
 app.use('/api/comment', commentRouter);
-app.use('/health', healthRouter);
 
 app.get('/', (req, res) => {
   res.send('Hello, Express!');
@@ -116,6 +112,11 @@ app.get('/terms', (req, res) => {
 
 app.get('/privacy', (req, res) => {
   res.sendFile(path.join(__dirname, 'terms', 'privacy.html'));
+});
+
+// 헬스 체크
+app.get('/health', (req, res) => {
+  res.status(200).send('OK');
 });
 
 // 서버 실행
