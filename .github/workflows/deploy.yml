@@ -39,7 +39,7 @@ jobs:
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         AWS_REGION: ${{ secrets.AWS_REGION }}
       run: |
-        aws s3 cp app.zip s3://elasticbeanstalk-${{ secrets.AWS_REGION }}-${{ github.run_id }}/app.zip
+        aws s3 cp app.zip s3://elasticbeanstalk-${{ secrets.AWS_REGION }}-<AWS_ACCOUNT_ID>/app.zip
 
     # 7. Elastic Beanstalk에 배포
     - name: Deploy to Elastic Beanstalk
@@ -53,7 +53,7 @@ jobs:
         aws elasticbeanstalk create-application-version \
           --application-name "$EB_APP_NAME" \
           --version-label "build-${{ github.run_number }}" \
-          --source-bundle S3Bucket="elasticbeanstalk-${{ secrets.AWS_REGION }}-${{ github.run_id }}",S3Key="app.zip"
+          --source-bundle S3Bucket="elasticbeanstalk-${{ secrets.AWS_REGION }}-<AWS_ACCOUNT_ID>",S3Key="app.zip"
 
         aws elasticbeanstalk update-environment \
           --application-name "$EB_APP_NAME" \
