@@ -4,8 +4,7 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "start": "node app.js",
-    "build": "echo 'Building application...' && mkdir -p dist && cp -r src/* dist/"
+    "build": "mkdir -p dist && rsync -av --exclude=node_modules --exclude=dist --exclude=.git ./ dist/"
   },
   "keywords": [],
   "author": "",
@@ -25,7 +24,8 @@
     "morgan": "^1.10.0",
     "multer": "^1.4.5-lts.1",
     "mysql2": "^3.11.3",
-    "rotating-file-stream": "^3.2.5"
+    "rotating-file-stream": "^3.2.5",
+    "rsync": "^0.6.1"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.26.0",
