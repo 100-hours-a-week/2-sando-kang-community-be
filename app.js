@@ -56,7 +56,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use(globalErrorHandler);
 
 const corsOptions = {
-  origin: ['http://127.0.0.1:5501', 'http://localhost:3001', 'http://43.202.140.0'],
+  origin: "*",
   methods: ['GET', 'POST', 'PUT', 'DELETE' , 'PATCH'],
   credentials: true, 
 };
@@ -71,7 +71,7 @@ app.use(
         defaultSrc: ["'self'"],
         scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
         styleSrc: ["'self'", "'unsafe-inline'"],
-        imgSrc: ["'self'", "data:", "https://*.example.com"],
+        imgSrc: ["'self'", "data:", "https://*.community.com"],
         fontSrc: ["'self'"],
         connectSrc: ["'self'"],
         objectSrc: ["'none'"],
@@ -96,7 +96,6 @@ app.use(
 const authRouter = require('./routes/authRoutes');
 const postRouter = require('./routes/postRoutes');
 const commentRouter = require('./routes/commentRoutes');
-const healthRouter = require('./routes/healthRoutes');
 
 app.use('/api/auth', authRouter);
 app.use('/api/post', postRouter);

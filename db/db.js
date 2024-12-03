@@ -1,18 +1,34 @@
-// 환경 파일 로드
-require('dotenv').config({ path: `.env.${process.env.NODE_ENV || 'local'}` });
-
 const mysql = require('mysql2');
 
 // MySQL 연결 풀 생성
-const pool = mysql.createPool({
-  host: process.env.DB_HOST || 'localhost', // 기본값: localhost
-  user: process.env.DB_USER || 'root',      // 기본값: root
-  password: process.env.DB_PASSWORD || '',  // 기본값: 빈 문자열
-  database: process.env.DB_NAME || 'test',  // 기본값: test
-  port: process.env.DB_PORT || 3306,        // 기본값: 3306
-  waitForConnections: true,
-  connectionLimit: 10, 
-  queueLimit: 0, 
-});
+var pool;
+try {
+  pool = mysql.createPool({
+    host: process.env.DB_HOST ,
+    user: process.env.DB_USER ,
+    password: process.env.DB_PASSWORD ,
+    database: process.env.DB_NAME ,
+    port: process.env.DB_PORT ,
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0,
+  });
+
+  console.log('MySQL 연결 풀 생성 성공');
+
+  // 연결 테스트
+  pool.getConnection((err, connection) => {
+    if (err) {
+      console.error('MySQL 연결 테스트 실패:', err);
+      process.exit(1);
+    } else {
+      console.log('MySQL 연결 테스트 성공');
+      connection.release();
+    }
+  });
+} catch (err) {
+  console.error('MySQL 연결 풀 생성 실패:', err);
+  process.exit(1); // 실패 시 프로세스 종료
+}
 
 module.exports = pool.promise();
