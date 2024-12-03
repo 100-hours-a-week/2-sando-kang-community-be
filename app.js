@@ -96,10 +96,12 @@ app.use(
 const authRouter = require('./routes/authRoutes');
 const postRouter = require('./routes/postRoutes');
 const commentRouter = require('./routes/commentRoutes');
+const healthRouter = require('./routes/healthRoutes');
 
 app.use('/api/auth', authRouter);
 app.use('/api/post', postRouter);
 app.use('/api/comment', commentRouter);
+app.use('/api/health', healthRouter);
 
 app.get('/', (req, res) => {
   res.send('Hello, Express!');
@@ -111,11 +113,6 @@ app.get('/terms', (req, res) => {
 
 app.get('/privacy', (req, res) => {
   res.sendFile(path.join(__dirname, 'terms', 'privacy.html'));
-});
-
-// 헬스 체크
-app.get('/health', (req, res) => {
-  res.status(200).send('OK');
 });
 
 // 서버 실행
