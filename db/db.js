@@ -1,3 +1,4 @@
+
 const mysql = require('mysql2');
 
 // MySQL 연결 풀 생성
