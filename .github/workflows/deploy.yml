@@ -65,14 +65,9 @@ jobs:
       run: |
         aws elasticbeanstalk create-application-version \
           --application-name "$EB_APP_NAME" \
-          --version-label "build-${{ github.run_number }}-$(date +%s)" \
+          --version-label "build-${{ github.run_number }}" \
           --source-bundle S3Bucket="elasticbeanstalk-${{ secrets.AWS_REGION }}-${{secrets.AWS_ACCOUNT_ID}}",S3Key="app.zip"
 
-        aws elasticbeanstalk delete-application-version \
-          --application-name "$EB_APP_NAME" \
-          --version-label "build-${{ github.run_number }}" \
-          --delete-source-bundle || true
-          
         aws elasticbeanstalk update-environment \
           --application-name "$EB_APP_NAME" \
           --environment-name "$EB_ENV_NAME" \
