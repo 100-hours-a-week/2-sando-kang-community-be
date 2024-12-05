@@ -2,7 +2,7 @@
   "name": "2-sando-kang-community-be",
   "version": "1.0.0",
   "description": "",
-  "main": "app.js",
+  "main": "./dist/main.cjs",
   "scripts": {
     "build": "webpack --mode production",
     "start:dist": "node ./dist/main.cjs",
