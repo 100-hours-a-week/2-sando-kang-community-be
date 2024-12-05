@@ -30,7 +30,7 @@ jobs:
 
     # 5. 배포를 위한 app.zip 생성
     - name: Zip application
-      run: zip -r app.zip dist/
+      run: zip -r app.zip dist/ package.json Procfile
 
     # 6. S3에 업로드
     - name: Upload to S3
