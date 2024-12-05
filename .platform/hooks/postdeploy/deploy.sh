@@ -1,23 +1,26 @@
 #!/bin/bash
 
-echo "Instance startup script executed at $(date)"
+echo "Instance startup script executed at $(date)" >> /var/log/startup.log
 
-# 기존 Node.js 프로세스 종료
-pkill -f 'node app.js' || true
-
-# 기존 프로세스 종료
+# 기존 PM2 프로세스 종료
+echo "Stopping existing PM2 processes..." >> /var/log/startup.log
 pm2 stop all || true
-
-# 애플리케이션 디렉토리 이동
-cd /home/ubuntu/2-sando-kang-community-be
+pm2 delete all || true
 
 # 의존성 설치
-npm install
+if [ ! -d "node_modules" ]; then
+    echo "Installing dependencies..." >> /var/log/startup.log
+    npm install
+else
+    echo "Dependencies already installed. Skipping 'npm install'..." >> /var/log/startup.log
+fi
 
 # 애플리케이션 실행
-sh ./start.sh
+echo "Starting application using PM2..." >> /var/log/startup.log
+pm2 start app.js --name "my-app" 
 
 # Nginx 재시작
+echo "Restarting Nginx..." >> /var/log/startup.log
 sudo systemctl restart nginx
 
-echo "Application started successfully"
+echo "Application started successfully at $(date)" >> /var/log/startup.log

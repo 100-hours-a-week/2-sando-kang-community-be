@@ -16,6 +16,8 @@ const globalErrorHandler = require('./middleware/globalErrorHandler');
 const app = express();
 const PORT = 3000;
 
+app.set('trust proxy', 1); 
+
 // 세션 저장소 설정
 const sessionStore = new MySQLStore({}, db);
 
