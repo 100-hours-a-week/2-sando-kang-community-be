@@ -63,22 +63,20 @@ jobs:
         EB_APP_NAME: ${{ secrets.EB_APP_NAME }}
         EB_ENV_NAME: ${{ secrets.EB_ENV_NAME }}
       run: |
-        
-        aws elasticbeanstalk delete-application-version \
-          --application-name "$EB_APP_NAME" \
-          --version-label "build-${{ github.run_number }}" \
-          --delete-source-bundle || true
-        
         aws elasticbeanstalk create-application-version \
           --application-name "$EB_APP_NAME" \
           --version-label "build-${{ github.run_number }}-$(date +%s)" \
           --source-bundle S3Bucket="elasticbeanstalk-${{ secrets.AWS_REGION }}-${{secrets.AWS_ACCOUNT_ID}}",S3Key="app.zip"
 
+        aws elasticbeanstalk delete-application-version \
+          --application-name "$EB_APP_NAME" \
+          --version-label "build-${{ github.run_number }}" \
+          --delete-source-bundle || true
+          
         aws elasticbeanstalk update-environment \
           --application-name "$EB_APP_NAME" \
           --environment-name "$EB_ENV_NAME" \
-          --version-label "build-${{ github.run_number }}-$(date +%s)"
-
+          --version-label "build-${{ github.run_number }}"
 
     # 9. 디버그용 로그 확인 (옵션)
     - name: Debug logs
