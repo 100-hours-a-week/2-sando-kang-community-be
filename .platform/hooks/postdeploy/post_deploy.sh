@@ -2,6 +2,12 @@
 
 echo "Instance startup script executed at $(date)" >> /var/log/startup.log
 
+# PM2 설치 확인 및 설치
+if ! command -v pm2 &> /dev/null; then
+    echo "pm2 not found, installing..."
+    sudo npm install -g pm2
+fi
+
 # 기존 PM2 프로세스 종료
 echo "Stopping existing PM2 processes..." >> /var/log/startup.log
 pm2 stop all || true

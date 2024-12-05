@@ -5,8 +5,8 @@
   "main": "./dist/main.cjs",
   "scripts": {
     "build": "webpack --mode production",
-    "start:dist": "node ./dist/main.cjs",
-    "start": "node ./dist/main.cjs"
+    "start:dist": "node main.cjs",
+    "start": "node main.cjs"
   },
   "keywords": [],
   "author": "",
