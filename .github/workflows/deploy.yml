@@ -64,6 +64,11 @@ jobs:
 
     # 8. 디버그용 로그 확인 (옵션)
     - name: Debug logs
+      env:
+        EB_ENV_NAME: ${{ secrets.EB_ENV_NAME }}
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_REGION: ${{ secrets.AWS_REGION }}
       if: failure()
       run: |
         echo "Fetching Elastic Beanstalk logs..."
@@ -74,7 +79,4 @@ jobs:
         aws elasticbeanstalk retrieve-environment-info \
           --environment-name "$EB_ENV_NAME" \
           --info-type tail
-      env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        AWS_REGION: ${{ secrets.AWS_REGION }}
+      
