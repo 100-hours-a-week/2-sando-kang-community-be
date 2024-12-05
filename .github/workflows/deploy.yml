@@ -18,7 +18,7 @@ jobs:
     - name: Set up Node.js
       uses: actions/setup-node@v3
       with:
-        node-version: 18
+        node-version: 22
 
     # 3. 종속성 설치
     - name: Install dependencies
@@ -28,22 +28,21 @@ jobs:
     - name: Build application
       run: npm run build
       
-      # Unit test
-      #- run: npm run test:unit
-      - name: Generate deployment package
-        run: |
-          cp -R .platform dist
-          cp package.json dist/package.json
-          cp package-lock.json dist/package-lock.json
-          cp Procfile dist/Procfile
-          
-    # 5. 배포를 위한 app.zip 생성
+    # 5. 필요한 파일 복사
+    - name: Prepare deployment package
+      run: |
+        cp -R .platform dist
+        cp package.json dist/package.json
+        cp package-lock.json dist/package-lock.json
+        cp Procfile dist/Procfile
+
+    # 6. 배포를 위한 app.zip 생성
     - name: Zip application
       run: |
         cd dist
         zip -r app.zip .
 
-    # 6. S3에 업로드
+    # 7. S3에 업로드
     - name: Upload to S3
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -53,7 +52,7 @@ jobs:
       run: |
         aws s3 cp app.zip s3://elasticbeanstalk-${{ secrets.AWS_REGION }}-${{secrets.AWS_ACCOUNT_ID}}/app.zip
 
-    # 7. Elastic Beanstalk에 배포
+    # 8. Elastic Beanstalk에 배포
     - name: Deploy to Elastic Beanstalk
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -73,7 +72,7 @@ jobs:
           --environment-name "$EB_ENV_NAME" \
           --version-label "build-${{ github.run_number }}"
 
-    # 8. 디버그용 로그 확인 (옵션)
+    # 9. 디버그용 로그 확인 (옵션)
     - name: Debug logs
       env:
         EB_ENV_NAME: ${{ secrets.EB_ENV_NAME }}
@@ -90,4 +89,3 @@ jobs:
         aws elasticbeanstalk retrieve-environment-info \
           --environment-name "$EB_ENV_NAME" \
           --info-type tail
-      
