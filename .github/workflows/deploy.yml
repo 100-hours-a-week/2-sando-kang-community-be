@@ -18,7 +18,7 @@ jobs:
     - name: Set up Node.js
       uses: actions/setup-node@v3
       with:
-        node-version: 18 # Node.js 버전 설정
+        node-version: 18
 
     # 3. 종속성 설치
     - name: Install dependencies
@@ -61,3 +61,20 @@ jobs:
           --application-name "$EB_APP_NAME" \
           --environment-name "$EB_ENV_NAME" \
           --version-label "build-${{ github.run_number }}"
+
+    # 8. 디버그용 로그 확인 (옵션)
+    - name: Debug logs
+      if: failure()
+      run: |
+        echo "Fetching Elastic Beanstalk logs..."
+        aws elasticbeanstalk request-environment-info \
+          --environment-name "$EB_ENV_NAME" \
+          --info-type tail
+
+        aws elasticbeanstalk retrieve-environment-info \
+          --environment-name "$EB_ENV_NAME" \
+          --info-type tail
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_REGION: ${{ secrets.AWS_REGION }}
