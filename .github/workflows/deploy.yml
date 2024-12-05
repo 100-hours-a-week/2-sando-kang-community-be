@@ -27,10 +27,21 @@ jobs:
     # 4. 애플리케이션 빌드
     - name: Build application
       run: npm run build
-
+      
+      # Unit test
+      #- run: npm run test:unit
+      - name: Generate deployment package
+        run: |
+          cp -R .platform dist
+          cp package.json dist/package.json
+          cp package-lock.json dist/package-lock.json
+          cp Procfile dist/Procfile
+          
     # 5. 배포를 위한 app.zip 생성
     - name: Zip application
-      run: zip -r app.zip dist/ package.json Procfile
+      run: |
+        cd dist
+        zip -r app.zip .
 
     # 6. S3에 업로드
     - name: Upload to S3
