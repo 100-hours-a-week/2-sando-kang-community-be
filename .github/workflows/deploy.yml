@@ -41,6 +41,7 @@ jobs:
       run: |
         cd dist
         zip -r app.zip .
+        mv app.zip ../
 
     # 7. S3에 업로드
     - name: Upload to S3
