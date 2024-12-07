@@ -27,7 +27,7 @@ jobs:
     # 4. 애플리케이션 빌드
     - name: Build application
       run: npm run build
-      
+
     # 5. 필요한 파일 복사
     - name: Prepare deployment package
       run: |
@@ -36,73 +36,51 @@ jobs:
         cp package-lock.json dist/package-lock.json
         cp Procfile dist/Procfile
 
-    # 6. 배포를 위한 app.zip 생성
-    - name: Zip application
+    # 6. Docker 로그인 (퍼블릭 ECR)
+    - name: Login to Amazon ECR Public
       run: |
-        cd dist
-        zip -r app.zip .
-        mv app.zip ../
+        aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws
 
-    # 7. AWS 로그인
-    - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v1
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: ap-northeast-2
-
-    # 8. ECR 로그인 및 이미지 빌드/푸시
-    - name: Login to Amazon ECR
-      id: login-ecr
-      uses: aws-actions/amazon-ecr-login@v1
-      with:
-        registry-type: public
-
-    - name: Build, tag, and push image to Amazon ECR
-      id: build-image
+    # 7. Docker 이미지 빌드 및 푸시
+    - name: Build, tag, and push image to Amazon ECR Public
       env:
-        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY_NAME }}
         IMAGE_TAG: ${{ github.sha }}
       run: |
-        docker buildx build --platform=linux/amd64 -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-        echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+        docker buildx build --platform=linux/amd64 -t public.ecr.aws/${{ secrets.ECR_REPOSITORY_NAME }}:$IMAGE_TAG .
+        docker push public.ecr.aws/${{ secrets.ECR_REPOSITORY_NAME }}:$IMAGE_TAG
+        echo "::set-output name=image::public.ecr.aws/${{ secrets.ECR_REPOSITORY_NAME }}:$IMAGE_TAG"
 
-    # 9. Elastic Beanstalk에 배포
+    # 8. Elastic Beanstalk에 배포
     - name: Deploy to Elastic Beanstalk
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         AWS_REGION: ap-northeast-2
-        AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
         EB_APP_NAME: ${{ secrets.EB_APP_NAME }}
         EB_ENV_NAME: ${{ secrets.EB_ENV_NAME }}
       run: |
         aws elasticbeanstalk create-application-version \
           --application-name "$EB_APP_NAME" \
           --version-label "build-${{ github.run_number }}" \
-          --source-bundle S3Bucket="elasticbeanstalk-${{ secrets.AWS_REGION }}-${{secrets.AWS_ACCOUNT_ID}}",S3Key="app.zip"
+          --source-bundle S3Bucket="elasticbeanstalk-${{ secrets.AWS_REGION }}-${{ secrets.AWS_ACCOUNT_ID }}",S3Key="app.zip"
 
         aws elasticbeanstalk update-environment \
           --application-name "$EB_APP_NAME" \
           --environment-name "$EB_ENV_NAME" \
           --version-label "build-${{ github.run_number }}"
 
-    # 10. 디버그용 로그 확인 (옵션)
-    - name: Debug logs
-      env:
-        EB_ENV_NAME: ${{ secrets.EB_ENV_NAME }}
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        AWS_REGION: ${{ secrets.AWS_REGION }}
-      if: failure()
-      run: |
-        echo "Fetching Elastic Beanstalk logs..."
-        aws elasticbeanstalk request-environment-info \
-          --environment-name "$EB_ENV_NAME" \
-          --info-type tail
 
-        aws elasticbeanstalk retrieve-environment-info \
-          --environment-name "$EB_ENV_NAME" \
-          --info-type tail
+
+
+
+
+ # 7. S3에 업로드
+    # - name: Upload to S3
+    #   env:
+    #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+    #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    #     AWS_REGION: ${{ secrets.AWS_REGION }}
+    #     AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+    #   run: |
+    #     aws s3 cp app.zip s3://elasticbeanstalk-${{ secrets.AWS_REGION }}-${{secrets.AWS_ACCOUNT_ID}}/app.zip
