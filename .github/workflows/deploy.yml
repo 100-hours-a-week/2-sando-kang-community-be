@@ -54,8 +54,9 @@ jobs:
         ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY_NAME }}
         IMAGE_TAG: ${{ github.sha }}
       run: |
-        docker build . -t public.ecr.aws/n1b7r8u0/${{ secrets.ECR_REPOSITORY_NAME }}:$IMAGE_TAG .
-        docker push public.ecr.aws/n1b7r8u0/${{ secrets.ECR_REPOSITORY_NAME }}:$IMAGE_TAG
+        docker build . -t $ECR_REPOSITORY
+        docker tag $ECR_REPOSITORY:$IMAGE_TAG public.ecr.aws/n1b7r8u0/$ECR_REPOSITORY:$IMAGE_TAG
+        docker push public.ecr.aws/n1b7r8u0/$ECR_REPOSITORY:$IMAGE_TAG
         echo "::set-output name=image::public.ecr.aws/${{ secrets.ECR_REPOSITORY_NAME }}:$IMAGE_TAG"
 
     # 8. Elastic Beanstalk에 배포
