@@ -39,7 +39,7 @@ jobs:
     # 6. Docker 로그인 (퍼블릭 ECR)
     - name: Login to Amazon ECR Public
       run: |
-        aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws
+        aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws/n1b7r8u0
 
     # 7. Docker 이미지 빌드 및 푸시
     - name: Build, tag, and push image to Amazon ECR Public
