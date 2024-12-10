@@ -106,7 +106,7 @@ app.use('/api/comment', commentRouter);
 app.use('/api/health', healthRouter);
 
 app.get('/', (req, res) => {
-  res.send('Hello, Express!');
+  res.send('Hello, Express Blue/Green By Docker!');
 });
 
 app.get('/terms', (req, res) => {
