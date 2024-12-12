@@ -24,7 +24,7 @@ WORKDIR /usr/share/nginx/html
 
 COPY --from=node-app /usr/src/app/build .
 
-COPY nginx.conf /etc/nginx/nginx.conf
+COPY /.platform/nginx/nginx.conf /etc/nginx/nginx.conf
 
 EXPOSE 80
 
