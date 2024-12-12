@@ -31,7 +31,7 @@ exports.login = asyncHandler(async (req, res, next) => {
   let profileUrl ;
   if(user.profile){
     const baseUrl = process.env.BASE_URL || 'http://127.0.0.1:3000';
-    profileUrl = user.profile ? `${baseUrl}/${user.profile}` : null;
+    profileUrl = user.profile ? `${user.profile}` : null;
   }
 
   // 세션 저장
