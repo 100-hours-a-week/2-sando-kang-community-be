@@ -1,27 +1,12 @@
 {
-  "AWSEBDockerrunVersion": "1",
-  "Containers": [
+    "AWSEBDockerrunVersion": "1",
+    "Image": {
+      "Name": "${ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG}",
+      "Update": "true"
+    },
+    "Ports": [
       {
-          "Name": "myapp",
-          "Image": {
-              "Name": "${ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG}",
-              "Update": "true"
-          },
-          "Ports": [
-              {
-                  "ContainerPort": "3000"
-              }
-          ]
-      },
-      {
-          "Name": "nginx",
-          "Image": "nginx:alpine",
-          "Ports": [
-              {
-                  "ContainerPort": "80"
-              }
-          ],
-          "VolumesFrom": ["myapp"]
+        "ContainerPort": "3000"
       }
-  ]
-}
+    ]
+  }

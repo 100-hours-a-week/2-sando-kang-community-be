@@ -8,20 +8,16 @@ RUN npm install --production
 
 COPY . .
 
-# 2. Production Stage (Node.js)
-FROM node:22-alpine AS node-app
+# 2. Production Stage
+FROM node:22-slim AS production
 
 WORKDIR /usr/src/app
 
 COPY --from=build /usr/src/app /usr/src/app
 
-CMD ["node", "app.js"] 
+ENV PORT=3000
 
-# 3. Production Stage (Nginx)
-FROM nginx:alpine
+EXPOSE 3000
 
-COPY /.platform/nginx/nginx.conf /etc/nginx/nginx.conf
-
-EXPOSE 80
-
-CMD ["nginx", "-g", "daemon off;"]
+# 애플리케이션 실행
+CMD ["node", "app.js"]
