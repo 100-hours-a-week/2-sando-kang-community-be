@@ -20,10 +20,6 @@ CMD ["node", "app.js"]
 # 3. Production Stage (Nginx)
 FROM nginx:alpine
 
-WORKDIR /usr/share/nginx/html
-
-COPY --from=node-app /usr/src/app/build .
-
 COPY /.platform/nginx/nginx.conf /etc/nginx/nginx.conf
 
 EXPOSE 80
