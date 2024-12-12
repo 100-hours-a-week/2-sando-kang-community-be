@@ -51,8 +51,8 @@ exports.deleteUser = async (user_id) => {
   }
 };
 
-// NOTE: 닉네임 업데이트
-exports.updateNickname = async (user_id, nickname, profile) => {
+// NOTE: 회원정보 업데이트
+exports.updateProfile = async (user_id, nickname, profile) => {
   const query = 'UPDATE user SET nickname = ? , profile = ? WHERE id = ?';
   try {
     const [result] = await connection.query(query, [nickname, profile, user_id]);
