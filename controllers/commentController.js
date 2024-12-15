@@ -46,10 +46,13 @@ exports.createComment = asyncHandler(async (req, res, next) => {
 
 //NOTE: 댓글 수정
 exports.updateComment = asyncHandler(async (req, res, next) => {
-    const { comment_id, content } = req.body;
+    const { user_id, comment_id, content } = req.body;
 
-    validateFields(['comment_id', 'content'], req.body);
+    validateFields(['user_id', 'comment_id', 'content'], req.body);
 
+    const commentDuplicate = await commentModel.validateComments(user_id, comment_id);
+    if(!commentDuplicate) return res.json(responseFormatter(false, ERROR_CODES.UPDATE_COMMENT_ERROR, '자신이 작성한 댓글만 수정 및 삭제할 수 있습니다'));   
+    
     const result = await commentModel.updateComment(comment_id, content);
     if (!result) {
         if(!addReply){
@@ -61,9 +64,12 @@ exports.updateComment = asyncHandler(async (req, res, next) => {
 
 //NOTE: 댓글 삭제
 exports.deleteComment = asyncHandler(async (req, res, next) => {
-    const { comment, post_id } = req.body;
+    const { user_id, comment_id, post_id } = req.body;
 
-    validateFields(['comment', 'post_id'], req.body);
+    validateFields(['user_id', 'comment_id', 'post_id'], req.body);
+
+    const commentDuplicate = await commentModel.validateComments(user_id, comment_id);
+    if(!commentDuplicate) return res.json(responseFormatter(false, ERROR_CODES.UPDATE_COMMENT_ERROR, '자신이 작성한 댓글만 수정 및 삭제할 수 있습니다'));   
 
     const deleteResult = await commentModel.deleteComment(comment);
     if (!deleteResult) {

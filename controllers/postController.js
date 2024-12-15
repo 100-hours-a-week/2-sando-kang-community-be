@@ -1,9 +1,11 @@
 const asyncHandler = require('../util/asyncHandler');
 const ERROR_CODES = require('../exception/errors')
 const responseFormatter = require('../util/ResponseFormatter');
+const { handleImageProcessing } = require('../util/s3ImageHandler');
 const postModel = require('../models/postModel');
 const authModel = require('../models/authModel');
 const commentModel = require('../models/commentModel');
+const likesModel = require('../models/likesModel');
 
 const validateFields = require('../util/validateFields');
 
@@ -20,13 +22,11 @@ exports.getPosts = asyncHandler(async (req, res) => {
 
     for(i = 0 ; i < postData.length ; i++){
         if(postData[i].profile){
-            const baseUrl = process.env.BASE_URL || 'http://127.0.0.1:3000';
-            imageUrl = postData[i].profile ? `${baseUrl}/${postData[i].profile}` : null;
+            imageUrl = postData[i].profile ? `${postData[i].profile}` : null;
             postData[i].profile = imageUrl;
         }
         if(postData[i].image){
-            const baseUrl = process.env.BASE_URL || 'http://127.0.0.1:3000';
-            imageUrl = postData[i].image ? `${baseUrl}/${postData[i].image}` : null;
+            imageUrl = postData[i].image ? `${postData[i].image}` : null;
             postData[i].image = imageUrl;
         }
     }
@@ -66,14 +66,12 @@ exports.getPostsById = asyncHandler(async (req, res, next) => {
 
     let profileUrl = null;
     if (user.profile) {
-        const baseUrl = process.env.BASE_URL || 'http://127.0.0.1:3000';
-        profileUrl = user.profile ? `${baseUrl}/${user.profile}` : null;
+        profileUrl = user.profile ? `${user.profile}` : null;
     }
 
     let imageUrl = null;
     if (post.image) {
-        const baseUrl = process.env.BASE_URL || 'http://127.0.0.1:3000';
-        imageUrl = post.image ? `${baseUrl}/${post.image}` : null;
+        imageUrl = post.image ? `${post.image}` : null;
     }
 
     const postData = {
@@ -97,11 +95,17 @@ exports.getPostsById = asyncHandler(async (req, res, next) => {
 exports.createPost = asyncHandler(async (req, res, next) => {
     const { user_id, title, content } = req.body;
     const image = req.file ? req.file.path : null;
+    console.log(`이미지: ${image}`);
     const date = new Date().toISOString().slice(0, 19).replace('T', ' ');
 
     validateFields(['user_id', 'title' , 'content'], req.body);
 
-    const postId = await postModel.createPost(user_id, title, content, image, date);
+    let postUrl = null;
+    if (req.file && req.file.buffer) {
+        postUrl = await handleImageProcessing(req.file.buffer, req.file.originalname);
+    }
+
+    const postId = await postModel.createPost(user_id, title, content, postUrl, date);
     if (!postId) {
         return res.json(responseFormatter(false, ERROR_CODES.CREATE_POST_ERROR, null));  
     }
@@ -128,7 +132,10 @@ exports.updatePost = asyncHandler(async (req, res, next) => {
 
     validateFields(['user_id', 'post_id', 'title', 'content', 'date'], req.body);
 
-    const post = await postModel.findPostByUserId(user_id);
+    const post = await postModel.findPostByUserId(post_id);
+
+    if (post.user_id != user_id ) return res.json(responseFormatter(false, ERROR_CODES.GET_POST_ERROR, '해당 게시글을 작성한 사람만 수정 또는 삭제할 수 있습니다.'));  
+
     if (post == null)  return res.json(responseFormatter(false, ERROR_CODES.GET_POST_ERROR, null));  
     
     const result = await postModel.updatePost(user_id, post_id, title, content, image, date);
@@ -141,31 +148,47 @@ exports.updatePost = asyncHandler(async (req, res, next) => {
 
 // NOTE: 게시글 삭제
 exports.deletePost = asyncHandler(async (req, res, next) => {
-    const { post_id } = req.body;
+    const { user_id, post_id } = req.body;
 
-    validateFields(['post_id'], req.body);
+    validateFields(['user_id', 'post_id'], req.body);
+
+    const post = await postModel.getPostById(post_id);
+    
+    if(post.user_id != user_id) return res.json(responseFormatter(false, ERROR_CODES.GET_POST_ERROR, '해당 게시글을 작성한 사람만 수정 또는 삭제할 수 있습니다.'));  
 
     const postResult = await postModel.deletePost(post_id);
-    if (!postResult) {
-        return res.json(responseFormatter(false, ERROR_CODES.DELETE_POST_ERROR, null));  
-    }
+    const likesResult = await likesModel.dropLikes(user_id, post_id);
 
-    const commentResult = await commentModel.deleteCommentByPostId(post_id);
-    if (!commentResult) {
-        return res.json(responseFormatter(false, ERROR_CODES.DELETE_POST_COMMENT_ERROR, null));  
-    }
+    if (!postResult) return res.json(responseFormatter(false, ERROR_CODES.DELETE_POST_ERROR, '게시물 삭제 실패입니다'));
+    if (!likesResult) return res.json(responseFormatter(false, ERROR_CODES.DELETE_COMMENT_ERROR, '좋아요 감소 실패입니다'));    
+    
+    await commentModel.deleteCommentByPostId(post_id);
+    
     return res.json(responseFormatter(true, 'delete_post_success'));
 });
 
 // NOTE: 게시글 좋아요+1
 exports.patchPost = asyncHandler(async (req, res, next) => {
-    const { post_id } = req.body;
+    const { user_id, post_id } = req.body;
 
-    validateFields(['post_id'], req.body);
+    validateFields(['user_id','post_id'], req.body);
 
-    const result = await postModel.patchPost(post_id);
-    if (!result) {
-        return res.json(responseFormatter(false, ERROR_CODES.UPDATE_POST_ERROR, null));  
+    // validate likes duplication
+    const likes = likesModel.validateLikes(user_id, post_id);
+    if (likes) return res.json(responseFormatter(false, ERROR_CODES.UPDATE_POST_ERROR, '한 게시물에 하나의 좋아요만 가능합니다'));  
+    else{
+        const patchPostResult = await postModel.patchPost(post_id);
+        const patchLikesResult = await likesModel.addLikes(user_id, post_id);
+
+        if (!patchPostResult) {
+            return res.json(responseFormatter(false, ERROR_CODES.UPDATE_POST_ERROR, '게시물 수정 실패입니다'));  
+        }
+
+        if (!patchLikesResult) {
+            return res.json(responseFormatter(false, ERROR_CODES.UPDATE_POST_ERROR, '좋아요 추가 실패입니다'));  
+        }
+
+        return res.json(responseFormatter(true, 'update_post_success', '게시물 수정 완료 되었습니다'));
     }
-    return res.json(responseFormatter(true, 'update_post_success'));
+  
 });

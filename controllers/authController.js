@@ -133,12 +133,16 @@ exports.updateNickname = asyncHandler(async (req, res) => {
 
   validateFields(['user_id', 'nickname'], req.body);
 
-  const user = await authModel.findUserById(user_id);
-  const existingProfileUrl = user.profile; 
+  const user = await authModel.findUserById(user_id); 
   
-  const newProfileUrl = await handleImageProcessing(req.file.buffer, req.file.originalname, existingProfileUrl);
+  let profileUrl = null; 
+  if (req.file && req.file.buffer) {
+    profileUrl = await handleImageProcessing(req.file.buffer, req.file.originalname);
+  }else {
+    profileUrl = user.profile;
+  }
 
-  const updateUser = await authModel.updateProfile(user_id, nickname, newProfileUrl);
+  const updateUser = await authModel.updateProfile(user.id, nickname, profileUrl);
   if(!updateUser) {
     return res.json(responseFormatter(false, ERROR_CODES.UPDATE_USER_ERROR, null));
   }else{
@@ -146,7 +150,7 @@ exports.updateNickname = asyncHandler(async (req, res) => {
     const responseData = {
       user_id: user_id,
       nickname: nickname,
-      profile: newProfileUrl,
+      profile: profileUrl,
     };
     console.log(responseData);
     return res.json(responseFormatter(true, 'update_success', responseData));
