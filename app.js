@@ -13,11 +13,10 @@ const fs = require('fs');
 const db = require('./db/db');
 const globalErrorHandler = require('./middleware/globalErrorHandler');
 
-const dotenv = require('dotenv');
-
-
 const app = express();
 const PORT = 3000;
+
+app.set('trust proxy', 1); 
 
 // 세션 저장소 설정
 const sessionStore = new MySQLStore({}, db);
@@ -59,7 +58,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use(globalErrorHandler);
 
 const corsOptions = {
-  origin: ['http://127.0.0.1:5501', 'http://localhost:3001', 'http://43.202.140.0'],
+  origin: "*",
   methods: ['GET', 'POST', 'PUT', 'DELETE' , 'PATCH'],
   credentials: true, 
 };
@@ -74,7 +73,7 @@ app.use(
         defaultSrc: ["'self'"],
         scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
         styleSrc: ["'self'", "'unsafe-inline'"],
-        imgSrc: ["'self'", "data:", "https://*.example.com"],
+        imgSrc: ["'self'", "data:", "https://*.community.com"],
         fontSrc: ["'self'"],
         connectSrc: ["'self'"],
         objectSrc: ["'none'"],
@@ -104,10 +103,10 @@ const healthRouter = require('./routes/healthRoutes');
 app.use('/api/auth', authRouter);
 app.use('/api/post', postRouter);
 app.use('/api/comment', commentRouter);
-app.use('/health', healthRouter);
+app.use('/api/health', healthRouter);
 
 app.get('/', (req, res) => {
-  res.send('Hello, Express!');
+  res.send('Hello, Express new EC2 Deployed!');// 수정 내용
 });
 
 app.get('/terms', (req, res) => {

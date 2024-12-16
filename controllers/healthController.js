@@ -1,3 +1,3 @@
-exports.checkHealth = (req, res, next) => {
-    res.send("HELLO, I'm Healthy!");
+exports.healthCheck = async (req, res) => { 
+    return res.status(200).send('Health check OK');
 };
