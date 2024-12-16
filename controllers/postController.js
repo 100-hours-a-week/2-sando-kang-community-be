@@ -95,10 +95,6 @@ exports.getPostsById = asyncHandler(async (req, res, next) => {
 exports.createPost = asyncHandler(async (req, res, next) => {
     const { user_id, title, content } = req.body;
 
-    if (err.message === 'img_format_failed') {
-        return res.json(responseFormatter(false, 'img_format_failed', 'JPG, PNG, GIF만 허용됩니다.'));
-    }
-
     const image = req.file ? req.file.path : null;
     console.log(`이미지: ${image}`);
     const date = new Date().toISOString().slice(0, 19).replace('T', ' ');
