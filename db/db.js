@@ -1,6 +1,6 @@
 const mysql = require('mysql2');
 //local 실행
-require('dotenv').config({ path: '.env.local' }); // dotenv 올바른 설정
+// require('dotenv').config({ path: '.env.local' }); // dotenv 올바른 설정
 
 console.log('DB_HOST:', process.env.DB_HOST ? '******' : '(Not Set)');
 console.log('DB_USER:', process.env.DB_USER ? '******' : '(Not Set)');
