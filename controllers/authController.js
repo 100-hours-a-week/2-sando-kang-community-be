@@ -15,7 +15,6 @@ exports.login = asyncHandler(async (req, res, next) => {
 
   validateFields(['email', 'password'], req.body);
 
-
   const encodedPassword = base64.encode(password);
 
   const user = await authModel.findUserByEmail(email);
@@ -168,5 +167,5 @@ exports.updatePassword = asyncHandler(async (req, res, next) => {
   if(!updatePassword){
     return res.json(responseFormatter(false, ERROR_CODES.UPDATE_PASSWORD_ERROR, null));  
   }
-  return res.json(responseFormatter(true, 'update_success'));
+  return res.json(responseFormatter(true, 'update_success', '비밀 번호 수정이 완료되었습니다'));
 });

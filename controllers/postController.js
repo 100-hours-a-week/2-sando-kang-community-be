@@ -94,6 +94,11 @@ exports.getPostsById = asyncHandler(async (req, res, next) => {
 //NOTE: 게시글 작성
 exports.createPost = asyncHandler(async (req, res, next) => {
     const { user_id, title, content } = req.body;
+
+    if (err.message === 'img_format_failed') {
+        return res.json(responseFormatter(false, 'img_format_failed', 'JPG, PNG, GIF만 허용됩니다.'));
+    }
+
     const image = req.file ? req.file.path : null;
     console.log(`이미지: ${image}`);
     const date = new Date().toISOString().slice(0, 19).replace('T', ' ');
@@ -128,22 +133,36 @@ exports.getPostById = asyncHandler(async (req, res, next) => {
 //NOTE: 게시글 수정
 exports.updatePost = asyncHandler(async (req, res, next) => {
     const { user_id, post_id, title, content, date } = req.body;
-    const image = req.file ? req.file.path : null;
+
+    console.log(`user_id: ${user_id}`);
+    console.log(`post_id: ${post_id}`);
+    console.log(`title: ${title}`);
+    console.log(`content: ${content}`);
+    console.log(`date: ${date}`);
+
+    let postUrl = null;
+    if (req.file && req.file.buffer) {
+        postUrl = await handleImageProcessing(req.file.buffer, req.file.originalname);
+    }else{
+        postUrl = null;
+    }
+
+    console.log(`post url : ${postUrl}`)
 
     validateFields(['user_id', 'post_id', 'title', 'content', 'date'], req.body);
 
-    const post = await postModel.findPostByUserId(post_id);
+    const post = await postModel.getPostById(post_id);
 
     if (post.user_id != user_id ) return res.json(responseFormatter(false, ERROR_CODES.GET_POST_ERROR, '해당 게시글을 작성한 사람만 수정 또는 삭제할 수 있습니다.'));  
 
     if (post == null)  return res.json(responseFormatter(false, ERROR_CODES.GET_POST_ERROR, null));  
     
-    const result = await postModel.updatePost(user_id, post_id, title, content, image, date);
+    const result = await postModel.updatePost(user_id, post_id, title, content, postUrl, date);
     if (!result) {
         return res.json(responseFormatter(false, ERROR_CODES.UPDATE_POST_ERROR, null));  
     }
 
-    return res.json(responseFormatter(true, 'update_post_success'));
+    return res.json(responseFormatter(true, 'update_post_success', '게시물 수정이 완료되었습니다'));
 });
 
 // NOTE: 게시글 삭제
@@ -164,7 +183,7 @@ exports.deletePost = asyncHandler(async (req, res, next) => {
     
     await commentModel.deleteCommentByPostId(post_id);
     
-    return res.json(responseFormatter(true, 'delete_post_success'));
+    return res.json(responseFormatter(true, 'delete_post_success', '게시물 삭제가 완료되었습니다'));
 });
 
 // NOTE: 게시글 좋아요+1
@@ -174,8 +193,8 @@ exports.patchPost = asyncHandler(async (req, res, next) => {
     validateFields(['user_id','post_id'], req.body);
 
     // validate likes duplication
-    const likes = likesModel.validateLikes(user_id, post_id);
-    if (likes) return res.json(responseFormatter(false, ERROR_CODES.UPDATE_POST_ERROR, '한 게시물에 하나의 좋아요만 가능합니다'));  
+    const likes = await likesModel.validateLikes(user_id, post_id);
+    if (likes.length > 0) return res.json(responseFormatter(false, ERROR_CODES.UPDATE_POST_ERROR, '한 게시물에 하나의 좋아요만 가능합니다'));  
     else{
         const patchPostResult = await postModel.patchPost(post_id);
         const patchLikesResult = await likesModel.addLikes(user_id, post_id);
@@ -188,7 +207,7 @@ exports.patchPost = asyncHandler(async (req, res, next) => {
             return res.json(responseFormatter(false, ERROR_CODES.UPDATE_POST_ERROR, '좋아요 추가 실패입니다'));  
         }
 
-        return res.json(responseFormatter(true, 'update_post_success', '게시물 수정 완료 되었습니다'));
+        return res.json(responseFormatter(true, 'update_post_success', '좋아요를 눌렀습니다'));
     }
   
 });

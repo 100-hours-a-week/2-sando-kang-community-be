@@ -40,7 +40,7 @@ exports.createComment = asyncHandler(async (req, res, next) => {
     if(!addReply){
         return res.json(responseFormatter(false, ERROR_CODES.UPDATE_COMMENT_ERROR, null));  
     }
-    return res.json(responseFormatter(true, 'create_comment_success'));
+    return res.json(responseFormatter(true, 'create_comment_success', '댓글 작성이 완료되었습니다'));
 });
 
 
@@ -59,19 +59,21 @@ exports.updateComment = asyncHandler(async (req, res, next) => {
           return res.json(responseFormatter(false, ERROR_CODES.UPDATE_COMMENT_ERROR, null));   
         } 
     }
-    return res.json(responseFormatter(true, 'update_comment_success'));
+    return res.json(responseFormatter(true, 'update_comment_success', '댓글 수정이 완료되었습니다'));
 });
 
 //NOTE: 댓글 삭제
 exports.deleteComment = asyncHandler(async (req, res, next) => {
     const { user_id, comment_id, post_id } = req.body;
 
+    console.log(`comment id:${comment_id} `);
+
     validateFields(['user_id', 'comment_id', 'post_id'], req.body);
 
     const commentDuplicate = await commentModel.validateComments(user_id, comment_id);
     if(!commentDuplicate) return res.json(responseFormatter(false, ERROR_CODES.UPDATE_COMMENT_ERROR, '자신이 작성한 댓글만 수정 및 삭제할 수 있습니다'));   
 
-    const deleteResult = await commentModel.deleteComment(comment);
+    const deleteResult = await commentModel.deleteComment(comment_id);
     if (!deleteResult) {
        return res.json(responseFormatter(false, ERROR_CODES.DELETE_COMMENT_ERROR, null));  
     }
@@ -81,5 +83,5 @@ exports.deleteComment = asyncHandler(async (req, res, next) => {
        return res.json(responseFormatter(false, ERROR_CODES.UPDATE_COMMENT_ERROR, null));  
     }
 
-    return res.json(responseFormatter(true, 'delete_comment_success'));
+    return res.json(responseFormatter(true, 'delete_comment_success', '댓글 삭제가 완료되었습니다'));
 });
