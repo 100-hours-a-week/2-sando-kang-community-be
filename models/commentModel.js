@@ -1,5 +1,18 @@
 const connection = require('../db/db');
 
+// NOTE: 댓글 검증
+exports.validateComments = async (user_id, comment_id) => {
+  const query = `SELECT * FROM comment WHERE user_id = ? AND id = ?`;
+  try {
+    const [result] = await connection.query(query, [user_id, comment_id]);
+    return result; 
+  } catch (error) {
+    console.error('Error validating comments:', error.message);
+    throw error;
+  }
+};
+
+
 // NOTE: 게시글 ID로 댓글 조회
 exports.findCommentsByPostId = async (postId) => {
   const query = `
@@ -58,7 +71,7 @@ exports.updateComment = async (comment_id, content) => {
 
 // NOTE: 댓글 삭제
 exports.deleteComment = async (comment_id) => {
-  const query = `DELETE FROM comment WHERE id = ?`;
+  const query = 'DELETE FROM comment WHERE id = ?';
 
   try {
     const [result] = await connection.query(query, [comment_id]);

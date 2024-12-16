@@ -2,14 +2,19 @@ const connection = require('../db/db');
 
 // NOTE: 게시글 목록 조회
 exports.getPaginatedPosts = async (startIndex, pageSize) => {
+  // startIndex와 pageSize가 숫자인지 확인
+  if (typeof startIndex !== 'number' || typeof pageSize !== 'number') {
+    throw new Error('Invalid pagination parameters: startIndex and pageSize must be numbers.');
+  }
+
   const query = `
     SELECT 
         post.id,
         user.nickname AS author,
-        user.profile AS profile,
+        COALESCE(user.profile, '') AS profile, -- NULL 처리
         post.title,
         post.content,
-        post.image,
+        COALESCE(post.image, '') AS image,    -- NULL 처리
         post.date,
         post.likes,
         post.views,
@@ -18,24 +23,26 @@ exports.getPaginatedPosts = async (startIndex, pageSize) => {
         post 
     JOIN
         user ON post.user_id = user.id
-    ORDER BY date DESC 
-    LIMIT ?, ?
+    ORDER BY post.date DESC 
+    LIMIT ?, ?;
   `;
+
   try {
     const [rows] = await connection.query(query, [startIndex, pageSize]);
+    console.log(`Fetched ${rows.length} rows from startIndex ${startIndex}`);
     return rows;
   } catch (error) {
-    console.error('Error fetching paginated posts:', error.message);
-    throw error;
+    console.error('Error fetching paginated posts at getPaginatedPosts:', error.message);
+    throw new Error('Database error while fetching paginated posts.');
   }
 };
 
 // NOTE: 게시글 작성
-exports.createPost = async (user_id, title, content, image, date) => {
+exports.createPost = async (user_id, title, content, postUrl, date) => {
   const query = `INSERT INTO post (user_id, title, content, image, date, likes, views, comments) 
                  VALUES (?, ?, ?, ?, ?, 0, 1, 0)`;
   try {
-    const [result] = await connection.query(query, [user_id, title, content, image, date]);
+    const [result] = await connection.query(query, [user_id, title, content, postUrl, date]);
     return result.insertId; 
   } catch (error) {
     console.error('Error creating post:', error.message);
