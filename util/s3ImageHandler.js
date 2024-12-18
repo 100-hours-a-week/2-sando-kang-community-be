@@ -12,7 +12,7 @@ const s3 = new S3Client({
 const uploadResizedImageToS3 = async (fileBuffer, originalName) => {
     const key = `uploads/${Date.now()}-${originalName}`;
     try {
-        const resizedBuffer = await sharp(fileBuffer).resize({ height: 1920, width: 1080 }).toBuffer();
+        const resizedBuffer = await sharp(fileBuffer).resize({ height: 306, width: 544, fit:'cover' }).toBuffer();
 
         await s3.send(
             new PutObjectCommand({
