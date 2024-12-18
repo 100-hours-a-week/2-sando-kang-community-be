@@ -38,3 +38,26 @@ jobs:
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
         echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
 
+
+    # 5. Elastic Beanstalk 배포를 위한 패키지 생성
+    - name: Prepare deployment package
+      run: |
+        mkdir -p deploy
+        cp Dockerrun.aws.json deploy/Dockerrun.aws.json
+        sed -i "s|\${ECR_REGISTRY}|public.ecr.aws/n1b7r8u0|g" deploy/Dockerrun.aws.json
+        sed -i "s|\${ECR_REPOSITORY}|${{ secrets.ECR_REPOSITORY_NAME }}|g" deploy/Dockerrun.aws.json
+        sed -i "s|\${IMAGE_TAG}|${{ github.sha }}|g" deploy/Dockerrun.aws.json
+        cd deploy && zip -r deploy.zip .
+
+    # 6. Elastic Beanstalk에 배포
+    - name: Deploy to Elastic Beanstalk
+      uses: einaregilsson/beanstalk-deploy@v14
+      with:
+        aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        application_name: ${{ secrets.EB_APP_NAME }}
+        environment_name: ${{ secrets.EB_ENV_NAME_DOCKER }}
+        version_label: docker-${{ github.sha }}-${{ github.run_number }}-${{ github.event.push.timestamp }}
+        region: ap-northeast-2
+        deployment_package: deploy/deploy.zip
+        wait_for_environment_recovery: 200
