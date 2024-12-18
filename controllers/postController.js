@@ -59,6 +59,7 @@ exports.getPostsById = asyncHandler(async (req, res, next) => {
     const comments = await commentModel.findCommentsByPostId(postId);
     const formattedComments = comments.map((comment) => ({
         id: comment.id,
+        user_id: comment.user_id,
         content: comment.comment,
         author: comment.author || 'Unknown',
         date: comment.date,
@@ -76,6 +77,7 @@ exports.getPostsById = asyncHandler(async (req, res, next) => {
 
     const postData = {
         post_id: post.id,
+        user_id: user.id,
         title: post.title,
         content: post.content,
         updatePostDate: post.date,
@@ -97,8 +99,7 @@ exports.createPost = asyncHandler(async (req, res, next) => {
 
     const image = req.file ? req.file.path : null;
     console.log(`이미지: ${image}`);
-    const date = new Date().toISOString().slice(0, 19).replace('T', ' ');
-
+    const date = new Date().toISOString().slice(0, 10);
     validateFields(['user_id', 'title' , 'content'], req.body);
 
     let postUrl = null;
@@ -113,18 +114,6 @@ exports.createPost = asyncHandler(async (req, res, next) => {
     return res.json(responseFormatter(true, 'create_post_success', { postId }));
 });
 
-//NOTE: 특정 게시글 조회
-exports.getPostById = asyncHandler(async (req, res, next) => {
-    const { user_id, post_id } = req.query;
-
-    validateFields(['user_id', 'post_id'], req.body);
-
-    const post = await postModel.getPostById(user_id, post_id);
-    if (!post || !post.length) {
-        return res.json(responseFormatter(false, ERROR_CODES.GET_POST_ERROR, null));  
-    }
-    return res.json(responseFormatter(true, 'get_post_success', { post: post[0] }));
-});
 
 //NOTE: 게시글 수정
 exports.updatePost = asyncHandler(async (req, res, next) => {

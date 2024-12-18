@@ -135,7 +135,7 @@ exports.updateNickname = asyncHandler(async (req, res) => {
   const user = await authModel.findUserById(user_id); 
   
   let profileUrl = null; 
-  if (req.file && req.file.buffer) {
+  if (req.file) {
     profileUrl = await handleImageProcessing(req.file.buffer, req.file.originalname);
   }else {
     profileUrl = user.profile;

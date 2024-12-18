@@ -59,6 +59,7 @@ exports.getPostById = async (postId) => {
     if (rows.length === 0) {
       throw new Error(`No post found with id: ${postId}`);
     }
+   
     return rows[0];
   } catch (error) {
     console.error('Error fetching post by ID:', error.message);

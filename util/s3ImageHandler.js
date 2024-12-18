@@ -1,5 +1,4 @@
 const { S3Client, PutObjectCommand, DeleteObjectCommand } = require('@aws-sdk/client-s3');
-const sharp = require('sharp');
 
 const s3 = new S3Client({
     region: process.env.AWS_REGION,
@@ -12,13 +11,11 @@ const s3 = new S3Client({
 const uploadResizedImageToS3 = async (fileBuffer, originalName) => {
     const key = `uploads/${Date.now()}-${originalName}`;
     try {
-        const resizedBuffer = await sharp(fileBuffer).resize({ height: 306, width: 544, fit:'cover' }).toBuffer();
-
         await s3.send(
             new PutObjectCommand({
                 Bucket: process.env.S3_BUCKET_NAME,
                 Key: key,
-                Body: resizedBuffer,
+                Body: fileBuffer,
                 ContentType: 'image/jpeg',
                 ACL: 'public-read',
             }),

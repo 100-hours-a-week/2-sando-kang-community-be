@@ -18,6 +18,7 @@ exports.findCommentsByPostId = async (postId) => {
   const query = `
     SELECT 
         comment.id, 
+        comment.user_id,
         comment.comment, 
         user.nickname AS author, 
         comment.date
@@ -57,11 +58,11 @@ exports.createComment = async (user_id, post_id, comment, date) => {
 };
 
 // NOTE: 댓글 수정
-exports.updateComment = async (comment_id, content) => {
-  const query = `UPDATE comment SET comment = ? WHERE id = ?`;
+exports.updateComment = async (comment_id, content, date) => {
+  const query = `UPDATE comment SET comment = ? and date = ? WHERE id = ?`;
 
   try {
-    const [result] = await connection.query(query, [content, comment_id]);
+    const [result] = await connection.query(query, [content, date, comment_id]);
     return result.affectedRows > 0; 
   } catch (error) {
     console.error('Error updating comment:', error.message);
