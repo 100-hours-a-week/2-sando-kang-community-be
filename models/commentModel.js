@@ -58,11 +58,11 @@ exports.createComment = async (user_id, post_id, comment, date) => {
 };
 
 // NOTE: 댓글 수정
-exports.updateComment = async (comment_id, content, date) => {
-  const query = `UPDATE comment SET comment = ? and date = ? WHERE id = ?`;
+exports.updateComment = async (content, date, comment_id, user_id) => {
+  const query = `UPDATE comment SET comment = ? , date = ? WHERE id = ? and user_id = ?`;
 
   try {
-    const [result] = await connection.query(query, [content, date, comment_id]);
+    const [result] = await connection.query(query, [content, date, comment_id, user_id]);
     return result.affectedRows > 0; 
   } catch (error) {
     console.error('Error updating comment:', error.message);
@@ -71,11 +71,11 @@ exports.updateComment = async (comment_id, content, date) => {
 };
 
 // NOTE: 댓글 삭제
-exports.deleteComment = async (comment_id) => {
-  const query = 'DELETE FROM comment WHERE id = ?';
+exports.deleteComment = async (comment_id, user_id) => {
+  const query = 'DELETE FROM comment WHERE id = ? and user_id = ?';
 
   try {
-    const [result] = await connection.query(query, [comment_id]);
+    const [result] = await connection.query(query, [comment_id, user_id]);
     return result.affectedRows > 0; 
   } catch (error) {
     console.error('Error deleting comment:', error.message);

@@ -41,8 +41,6 @@ exports.login = asyncHandler(async (req, res, next) => {
       profile: profileUrl,
   };
 
-  console.log(profileUrl);
-
   const responseData = {
       user_id: user.id,
       email: user.email,
