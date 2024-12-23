@@ -47,6 +47,9 @@ exports.getPostsById = asyncHandler(async (req, res, next) => {
     const { postId } = req.params;
 
     validateFields(['postId'], req.params);
+    
+    //NOTE: 조회수 증가
+    await postModel.updateViews(postId);
 
     const post = await postModel.getPostById(postId);
     if (!post) {
@@ -198,15 +201,3 @@ exports.patchPost = asyncHandler(async (req, res, next) => {
         return res.json(responseFormatter(true, 'update_post_success', '좋아요를 눌렀습니다'));
     }
 });
-
-//TODO: JWT 
-//NOTE: 조회수 증가
-exports.updateViews = asyncHandler(async (req, res, next) => {
-    const { post_id } = req.body;
-    validateFields(['post_id'], req.body);
-
-    const updatePost = await postModel.updateViews(post_id);
-    return res.json(responseFormatter(true, 'update_post_success'));
-
-});
-
