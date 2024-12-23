@@ -1,7 +1,7 @@
 const connection = require('../db/db');
 
-
-// NOTE: 좋아요 검증
+// TODO: JWT
+// NOTE: 좋아요 검증(중복 방지)
 exports.validateLikes = async (user_id, post_id) => {
   const query = `SELECT * FROM likes WHERE user_id = ? AND post_id = ?`;
   try {
@@ -13,6 +13,7 @@ exports.validateLikes = async (user_id, post_id) => {
   }
 };
 
+// TODO: JWT
 // NOTE: 좋아요 추가
 exports.addLikes = async (user_id, post_id) => {
     const query = `INSERT INTO likes (user_id, post_id) 
@@ -26,6 +27,7 @@ exports.addLikes = async (user_id, post_id) => {
     }
 };
 
+// TODO: JWT
 // NOTE: 좋아요 삭제
 exports.dropLikes = async (user_id, post_id) => {
 const query = `DELETE FROM likes WHERE user_id =? and post_id = ?`;

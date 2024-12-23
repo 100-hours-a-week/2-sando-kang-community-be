@@ -51,6 +51,7 @@ exports.deleteUser = async (user_id) => {
   }
 };
 
+// TODO: JWT
 // NOTE: 회원정보 업데이트
 exports.updateProfile = async (user_id, nickname, profileUrl) => {
   const query = 'UPDATE user SET nickname = ? , profile = ? WHERE id = ?';
@@ -62,7 +63,7 @@ exports.updateProfile = async (user_id, nickname, profileUrl) => {
     throw error;
   }
 };
-
+// TODO: JWT
 // NOTE: 비밀번호 업데이트
 exports.updatePassword = async (user_id, password) => {
   const query = 'UPDATE user SET password = ? WHERE id = ?';

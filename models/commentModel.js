@@ -1,18 +1,7 @@
 const connection = require('../db/db');
 
-// NOTE: 댓글 검증
-exports.validateComments = async (user_id, comment_id) => {
-  const query = `SELECT * FROM comment WHERE user_id = ? AND id = ?`;
-  try {
-    const [result] = await connection.query(query, [user_id, comment_id]);
-    return result; 
-  } catch (error) {
-    console.error('Error validating comments:', error.message);
-    throw error;
-  }
-};
 
-
+//TODO: JWT
 // NOTE: 게시글 ID로 댓글 조회
 exports.findCommentsByPostId = async (postId) => {
   const query = `
@@ -43,7 +32,7 @@ exports.findCommentsByPostId = async (postId) => {
     throw error;
   }
 };
-
+//TODO: JWT
 // NOTE: 댓글 작성
 exports.createComment = async (user_id, post_id, comment, date) => {
   const query = `INSERT INTO comment (user_id, post_id, comment, date) VALUES (?, ?, ?, ?)`;
@@ -57,6 +46,7 @@ exports.createComment = async (user_id, post_id, comment, date) => {
   }
 };
 
+//TODO: JWT
 // NOTE: 댓글 수정
 exports.updateComment = async (content, date, comment_id, user_id) => {
   const query = `UPDATE comment SET comment = ? , date = ? WHERE id = ? and user_id = ?`;
@@ -69,7 +59,7 @@ exports.updateComment = async (content, date, comment_id, user_id) => {
     throw error;
   }
 };
-
+//TODO: JWT
 // NOTE: 댓글 삭제
 exports.deleteComment = async (comment_id, user_id) => {
   const query = 'DELETE FROM comment WHERE id = ? and user_id = ?';

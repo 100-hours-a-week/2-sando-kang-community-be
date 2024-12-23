@@ -9,6 +9,7 @@ const likesModel = require('../models/likesModel');
 
 const validateFields = require('../util/validateFields');
 
+// TODO: JWT
 //NOTE: posts.js 연동 - 게시글 목록 조회
 exports.getPosts = asyncHandler(async (req, res) => {
     const page = parseInt(req.query.page) || 1;
@@ -40,9 +41,8 @@ exports.getPosts = asyncHandler(async (req, res) => {
     return res.json(responseFormatter(true, 'get_posts_success', { postData, hasMore }));
 });
 
-
-
-//NOTE: 게시글 + 댓글 조회
+// TODO: JWT
+// NOTE: 게시글 + 댓글 조회
 exports.getPostsById = asyncHandler(async (req, res, next) => {
     const { postId } = req.params;
 
@@ -93,6 +93,7 @@ exports.getPostsById = asyncHandler(async (req, res, next) => {
     return res.json(responseFormatter(true, 'get_posts_succcess', { postData }));
 });
 
+//TODO: JWT
 //NOTE: 게시글 작성
 exports.createPost = asyncHandler(async (req, res, next) => {
     const { user_id, title, content } = req.body;
@@ -114,7 +115,7 @@ exports.createPost = asyncHandler(async (req, res, next) => {
     return res.json(responseFormatter(true, 'create_post_success', { postId }));
 });
 
-
+//TODO: JWT
 //NOTE: 게시글 수정
 exports.updatePost = asyncHandler(async (req, res, next) => {
     const { user_id, post_id, title, content, date } = req.body;
@@ -150,6 +151,7 @@ exports.updatePost = asyncHandler(async (req, res, next) => {
     return res.json(responseFormatter(true, 'update_post_success', '게시물 수정이 완료되었습니다'));
 });
 
+// TODO: JWT
 // NOTE: 게시글 삭제
 exports.deletePost = asyncHandler(async (req, res, next) => {
     const { user_id, post_id } = req.body;
@@ -171,7 +173,8 @@ exports.deletePost = asyncHandler(async (req, res, next) => {
     return res.json(responseFormatter(true, 'delete_post_success', '게시물 삭제가 완료되었습니다'));
 });
 
-// NOTE: 게시글 좋아요+1
+// TODO: JWT
+// NOTE: 게시글 좋아요 증가
 exports.patchPost = asyncHandler(async (req, res, next) => {
     const { user_id, post_id } = req.body;
 
@@ -194,5 +197,16 @@ exports.patchPost = asyncHandler(async (req, res, next) => {
 
         return res.json(responseFormatter(true, 'update_post_success', '좋아요를 눌렀습니다'));
     }
-  
 });
+
+//TODO: JWT 
+//NOTE: 조회수 증가
+exports.updateViews = asyncHandler(async (req, res, next) => {
+    const { post_id } = req.body;
+    validateFields(['post_id'], req.body);
+
+    const updatePost = await postModel.updateViews(post_id);
+    return res.json(responseFormatter(true, 'update_post_success'));
+
+});
+
