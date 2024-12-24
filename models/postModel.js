@@ -130,13 +130,25 @@ exports.discountComment = async (post_id) => {
 };
 
 // NOTE: 게시글 좋아요
-exports.patchPost = async (post_id) => {
+exports.increasePostLikes = async (post_id) => {
   const query = `UPDATE post SET likes = likes + 1 WHERE id = ?`;
   try {
     const [result] = await connection.query(query, [post_id]);
     return result.affectedRows > 0; 
   } catch (error) {
     console.error('Error patching post likes:', error.message);
+    throw error;
+  }
+};
+
+// NOTE: 게시글 좋아요
+exports.decreasePostLikes = async (post_id) => {
+  const query = `UPDATE post SET likes = likes - 1 WHERE id = ?`;
+  try {
+    const [result] = await connection.query(query, [post_id]);
+    return result.affectedRows > 0; 
+  } catch (error) {
+    console.error('Error decreasing post likes:', error.message);
     throw error;
   }
 };

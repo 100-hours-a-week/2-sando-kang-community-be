@@ -12,34 +12,33 @@ const validateFields = require('../util/validateFields');
 // TODO: JWT
 //NOTE: posts.js 연동 - 게시글 목록 조회
 exports.getPosts = asyncHandler(async (req, res) => {
-    const page = parseInt(req.query.page) || 1;
+    const page = parseInt(req.query.page) || 1; 
     const pageSize = 5;
-    const startIndex = (page - 1) * pageSize;
-
-    console.log(`pagesize : ${pageSize}`);
-    console.log(`startIndex : ${startIndex}`);
-
+    const startIndex = (page - 1) * pageSize; 
+  
     const postData = await postModel.getPaginatedPosts(startIndex, pageSize);
-
-    for(i = 0 ; i < postData.length ; i++){
-        if(postData[i].profile){
-            imageUrl = postData[i].profile ? `${postData[i].profile}` : null;
-            postData[i].profile = imageUrl;
-        }
-        if(postData[i].image){
-            imageUrl = postData[i].image ? `${postData[i].image}` : null;
-            postData[i].image = imageUrl;
-        }
+  
+    for (let i = 0; i < postData.length; i++) {
+      if (postData[i].profile) {
+        const imageUrl = postData[i].profile ? `${postData[i].profile}` : null;
+        postData[i].profile = imageUrl;
+      }
+      if (postData[i].image) {
+        const imageUrl = postData[i].image ? `${postData[i].image}` : null;
+        postData[i].image = imageUrl;
+      }
     }
-
-    if (!postData) {
-        return res.json(responseFormatter(false, ERROR_CODES.GET_POST_ERROR, null));
-    }
-
-    // 데이터가 없으면 success와 함께 빈 배열로 응답
-    const hasMore = postData.length === pageSize; // 남은 게시물이 있는지 여부
-    return res.json(responseFormatter(true, 'get_posts_success', { postData, hasMore }));
-});
+  
+    const hasMore = postData.length === pageSize;
+  
+    console.log(`Fetched ${postData.length} rows from startIndex ${startIndex}`);
+    console.log(`hasMore: ${hasMore}`);
+  
+    return res.json(responseFormatter(true, "get_posts_success", { postData, hasMore }));
+  });
+  
+  
+  
 
 // TODO: JWT
 // NOTE: 게시글 + 댓글 조회
@@ -177,27 +176,42 @@ exports.deletePost = asyncHandler(async (req, res, next) => {
 });
 
 // TODO: JWT
-// NOTE: 게시글 좋아요 증가
+// NOTE: 게시글 좋아요 증가/감소
 exports.patchPost = asyncHandler(async (req, res, next) => {
     const { user_id, post_id } = req.body;
 
-    validateFields(['user_id','post_id'], req.body);
+    validateFields(['user_id', 'post_id'], req.body);
 
     // validate likes duplication
     const likes = await likesModel.validateLikes(user_id, post_id);
-    if (likes.length > 0) return res.json(responseFormatter(false, ERROR_CODES.UPDATE_POST_ERROR, '한 게시물에 하나의 좋아요만 가능합니다'));  
-    else{
-        const patchPostResult = await postModel.patchPost(post_id);
-        const patchLikesResult = await likesModel.addLikes(user_id, post_id);
 
-        if (!patchPostResult) {
-            return res.json(responseFormatter(false, ERROR_CODES.UPDATE_POST_ERROR, '게시물 수정 실패입니다'));  
+    if (likes.length > 0) {
+        
+        const removeLikesResult = await likesModel.removeLikes(user_id, post_id);
+        const decreasePostLikesResult = await postModel.decreasePostLikes(post_id);
+
+        if (!removeLikesResult) {
+            return res.json(responseFormatter(false, ERROR_CODES.UPDATE_POST_ERROR, '좋아요 제거 실패입니다'));
         }
 
-        if (!patchLikesResult) {
-            return res.json(responseFormatter(false, ERROR_CODES.UPDATE_POST_ERROR, '좋아요 추가 실패입니다'));  
+        if (!decreasePostLikesResult) {
+            return res.json(responseFormatter(false, ERROR_CODES.UPDATE_POST_ERROR, '게시물 좋아요 수 감소 실패입니다'));
         }
 
-        return res.json(responseFormatter(true, 'update_post_success', '좋아요를 눌렀습니다'));
+        return res.json(responseFormatter(true, 'remove_like_success', '좋아요를 취소했습니다'));
+    } else {
+        // 좋아요가 존재하지 않으면 증가 (추가)
+        const addLikesResult = await likesModel.addLikes(user_id, post_id);
+        const increasePostLikesResult = await postModel.increasePostLikes(post_id);
+
+        if (!addLikesResult) {
+            return res.json(responseFormatter(false, ERROR_CODES.UPDATE_POST_ERROR, '좋아요 추가 실패입니다'));
+        }
+
+        if (!increasePostLikesResult) {
+            return res.json(responseFormatter(false, ERROR_CODES.UPDATE_POST_ERROR, '게시물 좋아요 수 증가 실패입니다'));
+        }
+
+        return res.json(responseFormatter(true, 'add_like_success', '좋아요를 눌렀습니다'));
     }
 });

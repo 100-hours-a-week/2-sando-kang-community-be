@@ -28,6 +28,20 @@ exports.addLikes = async (user_id, post_id) => {
 };
 
 // TODO: JWT
+// NOTE: 좋아요 감소
+exports.removeLikes = async (user_id, post_id) => {
+  const query = `DELETE FROM likes WHERE user_id = ? and post_id = ?`;
+  try {
+    const [result] = await connection.query(query, [user_id, post_id]);
+    return result; 
+  } catch (error) {
+    console.error('Error adding likes:', error.message);
+    throw error;
+  }
+};
+
+
+// TODO: JWT
 // NOTE: 좋아요 삭제
 exports.dropLikes = async (user_id, post_id) => {
 const query = `DELETE FROM likes WHERE user_id =? and post_id = ?`;
