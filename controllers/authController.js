@@ -4,9 +4,10 @@ const ERROR_CODES = require('../exception/errors')
 const authModel = require('../models/authModel');
 const responseFormatter = require('../util/ResponseFormatter');
 const base64 = require('base-64');
-const session = require('express-session')
 const validateFields = require('../util/validateFields');
+const generateToken = require('../security/jwt');
 
+require('dotenv').config({ path: '.env.local' }); 
 
 
 // NOTE: 로그인
@@ -33,19 +34,14 @@ exports.login = asyncHandler(async (req, res, next) => {
     profileUrl = user.profile ? `${user.profile}` : null;
   }
 
-  // 세션 저장
-  req.session.user = {
-      user_id: user.id,
-      email: user.email,
-      nickname: user.nickname,
-      profile: profileUrl,
-  };
+  const token = generateToken(user);
 
   const responseData = {
       user_id: user.id,
       email: user.email,
       nickname: user.nickname,
       profile: profileUrl,
+      token: token
   };
 
   res.setHeader('Access-Control-Allow-Origin', '*');

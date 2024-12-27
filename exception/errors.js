@@ -14,6 +14,14 @@ const ERROR_CODES = Object.freeze({
         code: 'logout_failed',
         status: 40102,
     },
+    INVALID_JWT_TOKEN: {
+        code: 'jwt_token_not_available',
+        status: 40103,
+    },
+    EXPIRED_JWT_TOKEN: {
+        code: 'jwt_token_expired',
+        status: 40104,
+    },
 
     // Not Found Error
     USER_NOT_FOUND: {

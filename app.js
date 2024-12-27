@@ -3,8 +3,6 @@ const timeout = require('connect-timeout');
 const rateLimit = require('express-rate-limit');
 const cors = require('cors');
 const helmet = require('helmet');
-const session = require('express-session');
-const MySQLStore = require('express-mysql-session')(session);
 const path = require('path');
 const morgan = require('morgan');
 const moment = require('moment-timezone');
@@ -17,9 +15,6 @@ const app = express();
 const PORT = 3000;
 
 app.set('trust proxy', 1); 
-
-// 세션 저장소 설정
-const sessionStore = new MySQLStore({}, db);
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -80,17 +75,6 @@ app.use(
         upgradeInsecureRequests: [],
       },
     },
-  })
-);
-
-// 세션 설정
-app.use(
-  session({
-    secret: 'my_secret_key',
-    resave: false,
-    saveUninitialized: false,
-    store: sessionStore,
-    cookie: { secure: false },
   })
 );
 
