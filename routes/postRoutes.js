@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const postController = require('../controllers/postController');
 const upload = require('../middleware/upload'); 
-const authenticateJWT = require('../security/authenticateJWT'); // JWT 미들웨어 추가
+const authenticateJWT = require('../security/authenticateJWT'); 
 
 router.get('/', postController.getPosts);
 router.get('/:postId', postController.getPostsById);
