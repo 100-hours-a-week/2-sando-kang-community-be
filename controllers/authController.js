@@ -7,6 +7,9 @@ const base64 = require('base-64');
 const validateFields = require('../util/validateFields');
 const generateToken = require('../security/jwt');
 
+//TODO: redis를 활용한 만기토큰 관리
+//const blacklist = new Set(); 
+
 require('dotenv').config({ path: '.env.local' }); 
 
 
@@ -50,13 +53,11 @@ exports.login = asyncHandler(async (req, res, next) => {
 
 // NOTE: 로그아웃
 exports.logout = asyncHandler(async (req, res, next) => {
-  req.session.destroy((err) => {
-      if (err) {
-        return res.json(responseFormatter(false, ERROR_CODES.LOGOUT_FAILED, null));  
-      }
-      res.clearCookie('connect.sid');
-      return res.json(responseFormatter(true, 'logout_success'));
-  });
+   //TODO: redis 만기 토큰 관리
+   //blacklist.add(token);
+   //console.log(`Token added to blacklist: ${token}`);
+
+   return res.json(responseFormatter(true, 'logout_success', null));
 });
 
 // NOTE: 회원가입

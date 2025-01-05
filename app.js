@@ -8,11 +8,21 @@ const morgan = require('morgan');
 const moment = require('moment-timezone');
 const rotatingFileStream = require('rotating-file-stream');
 const fs = require('fs');
-const db = require('./db/db');
+const dotenv = require('dotenv');
+
 const globalErrorHandler = require('./middleware/globalErrorHandler');
 
 const app = express();
 const PORT = 3000;
+
+
+if (fs.existsSync('.env.local')) {
+  dotenv.config({ path: '.env.local' });
+  console.log('Loaded .env.local');
+} else {
+  console.log('.env.local file not found');
+}
+
 
 app.set('trust proxy', 1); 
 

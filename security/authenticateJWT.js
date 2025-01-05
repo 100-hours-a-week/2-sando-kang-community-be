@@ -2,14 +2,12 @@ const responseFormatter = require('../util/ResponseFormatter');
 const ERROR_CODES = require('../exception/errors');
 const jwt = require('jsonwebtoken');
 
-//require('dotenv').config({ path: '.env.local' }); 
-
 const authenticateJWT = (req, res, next) => {
   const token = req.header('Authorization');
 
   if (token) {
     const cleanToken = token.startsWith('Bearer ') ? token.replace('Bearer ', '') : token;
-
+    console.log(`token : ${cleanToken}`);
     jwt.verify(cleanToken, process.env.JWT_SECRET_KEY, (err, user) => {
       if (err) {
         console.error('JWT Verification Error:', err.message);

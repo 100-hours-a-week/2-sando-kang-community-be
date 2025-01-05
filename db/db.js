@@ -1,6 +1,4 @@
 const mysql = require('mysql2');
-//local 실행
-//require('dotenv').config({ path: '.env.local' }); 
 
 console.log('DB_HOST:', process.env.DB_HOST ? '******' : 'not set');
 console.log('DB_USER:', process.env.DB_USER ? '******' : 'not set');
