@@ -1,4 +1,4 @@
-name: Deploy to Amazon Web Service Elastic Beanstalk
+name: Deploy sando-community-be using AWS EB
 
 on:
   pull_request:
