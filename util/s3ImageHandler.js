@@ -1,5 +1,4 @@
 const { S3Client, PutObjectCommand, DeleteObjectCommand } = require('@aws-sdk/client-s3');
-const sharp = require('sharp');
 
 const s3 = new S3Client({
     region: process.env.AWS_REGION,
@@ -12,13 +11,11 @@ const s3 = new S3Client({
 const uploadResizedImageToS3 = async (fileBuffer, originalName) => {
     const key = `uploads/${Date.now()}-${originalName}`;
     try {
-        const resizedBuffer = await sharp(fileBuffer).resize({ height: 1920, width: 1080 }).toBuffer();
-
         await s3.send(
             new PutObjectCommand({
                 Bucket: process.env.S3_BUCKET_NAME,
                 Key: key,
-                Body: resizedBuffer,
+                Body: fileBuffer,
                 ContentType: 'image/jpeg',
                 ACL: 'public-read',
             }),
@@ -41,7 +38,6 @@ const deleteImageFromS3 = async (key) => {
                 Key: key,
             }),
         );
-
         console.log(`Successfully deleted image from S3: ${key}`);
     } catch (error) {
         console.error('Error deleting image from S3:', error);
@@ -52,14 +48,11 @@ const deleteImageFromS3 = async (key) => {
 
 const handleImageProcessing = async (fileBuffer, originalName, existingUrl = null) => {
     try {
-        
         if (existingUrl) {
             const existingKey = existingUrl.split('/').slice(-2).join('/');
             await deleteImageFromS3(existingKey);
         }
-
         const newImageUrl = await uploadResizedImageToS3(fileBuffer, originalName);
-
         return newImageUrl;
     } catch (error) {
         console.error('Error handling image processing:', error);

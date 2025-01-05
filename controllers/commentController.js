@@ -28,10 +28,11 @@ exports.getCommentsByPostId = asyncHandler(async (req, res) => {
 
 //NOTE: 댓글 등록
 exports.createComment = asyncHandler(async (req, res, next) => {
-    const { user_id, post_id, comment, date } = req.body;
+    const { user_id, post_id, comment } = req.body;
 
-    validateFields(['user_id', 'post_id', 'comment', 'date'], req.body);
+    validateFields(['user_id', 'post_id', 'comment'], req.body);
 
+    const date = new Date().toISOString().slice(0, 10);
     const createComment = await commentModel.createComment(user_id, post_id, comment, date);
     if(!createComment) {
         return res.json(responseFormatter(false, ERROR_CODES.CREATE_COMMENT_ERROR, null));  
@@ -49,11 +50,9 @@ exports.updateComment = asyncHandler(async (req, res, next) => {
     const { user_id, comment_id, content } = req.body;
 
     validateFields(['user_id', 'comment_id', 'content'], req.body);
-
-    const commentDuplicate = await commentModel.validateComments(user_id, comment_id);
-    if(!commentDuplicate) return res.json(responseFormatter(false, ERROR_CODES.UPDATE_COMMENT_ERROR, '자신이 작성한 댓글만 수정 및 삭제할 수 있습니다'));   
     
-    const result = await commentModel.updateComment(comment_id, content);
+    const date = new Date().toISOString().slice(0, 10);
+    const result = await commentModel.updateComment(content, date, comment_id, user_id);
     if (!result) {
         if(!addReply){
           return res.json(responseFormatter(false, ERROR_CODES.UPDATE_COMMENT_ERROR, null));   
@@ -66,14 +65,9 @@ exports.updateComment = asyncHandler(async (req, res, next) => {
 exports.deleteComment = asyncHandler(async (req, res, next) => {
     const { user_id, comment_id, post_id } = req.body;
 
-    console.log(`comment id:${comment_id} `);
-
     validateFields(['user_id', 'comment_id', 'post_id'], req.body);
 
-    const commentDuplicate = await commentModel.validateComments(user_id, comment_id);
-    if(!commentDuplicate) return res.json(responseFormatter(false, ERROR_CODES.UPDATE_COMMENT_ERROR, '자신이 작성한 댓글만 수정 및 삭제할 수 있습니다'));   
-
-    const deleteResult = await commentModel.deleteComment(comment_id);
+    const deleteResult = await commentModel.deleteComment(comment_id, user_id);
     if (!deleteResult) {
        return res.json(responseFormatter(false, ERROR_CODES.DELETE_COMMENT_ERROR, null));  
     }

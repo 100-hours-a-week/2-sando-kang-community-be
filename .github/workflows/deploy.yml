@@ -1,12 +1,15 @@
-name: Deploy to Amazon Web Service Elastic Beanstalk
+name: Deploy sando-community-be using AWS EB
 
 on:
-  push:
+  pull_request:
+    types:
+      - closed
     branches:
       - main
 
 jobs:
   deploy:
+    if: github.event.pull_request.merged == true && github.repository == '2-sando-kang-community-be'
     runs-on: ubuntu-latest
 
     steps:
@@ -37,6 +40,7 @@ jobs:
         docker build . -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
         echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+
 
     # 5. Elastic Beanstalk 배포를 위한 패키지 생성
     - name: Prepare deployment package
