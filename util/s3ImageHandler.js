@@ -38,7 +38,6 @@ const deleteImageFromS3 = async (key) => {
                 Key: key,
             }),
         );
-
         console.log(`Successfully deleted image from S3: ${key}`);
     } catch (error) {
         console.error('Error deleting image from S3:', error);
@@ -49,14 +48,11 @@ const deleteImageFromS3 = async (key) => {
 
 const handleImageProcessing = async (fileBuffer, originalName, existingUrl = null) => {
     try {
-        
         if (existingUrl) {
             const existingKey = existingUrl.split('/').slice(-2).join('/');
             await deleteImageFromS3(existingKey);
         }
-
         const newImageUrl = await uploadResizedImageToS3(fileBuffer, originalName);
-
         return newImageUrl;
     } catch (error) {
         console.error('Error handling image processing:', error);
