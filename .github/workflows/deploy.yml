@@ -12,7 +12,7 @@ jobs:
     if: >
       github.event.pull_request.merged == true &&
       github.event.pull_request.base.ref == 'main' &&
-      github.event.pull_request.head.ref.startsWith('feature') &&
+      startsWith(github.event.pull_request.head.ref, 'feature') &&
       github.repository == '2-sando-kang-community-be'
     runs-on: ubuntu-latest
 
