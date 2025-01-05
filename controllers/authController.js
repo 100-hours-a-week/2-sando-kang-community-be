@@ -76,18 +76,12 @@ exports.signin = asyncHandler(async (req, res, next) => {
 
     console.log(`Profile URL: ${profileUrl || 'No file uploaded'}`);
 
-    const createUser = await authModel.createUser(email, encodedPassword, nickname, profileUrl);
+    await authModel.createUser(email, encodedPassword, nickname, profileUrl);
 
-    if (!createUser) {
-      console.error('User creation failed.');
-      return res.json(responseFormatter(false, ERROR_CODES.CREATE_USER_ERROR, null));
-    }
-
-    req.session.user = { email, nickname, profile: profileUrl };
-    return res.json(responseFormatter(true, 'signin_success'));
+    return res.json(responseFormatter(true, '회원 가입이 완료 되었습니다'));
   } catch (error) {
     console.error('Error during user creation:', error.message);
-    return res.status(500).json(responseFormatter(false, 'internal_server_error', null));
+    return res.status(500).json(responseFormatter(false, ERROR_CODES.CREATE_USER_ERROR, null));
   }
 });
 
@@ -136,11 +130,9 @@ exports.updateNickname = asyncHandler(async (req, res) => {
     profileUrl = user.profile;
   }
 
-  const updateUser = await authModel.updateProfile(user.id, nickname, profileUrl);
-  if(!updateUser) {
-    return res.json(responseFormatter(false, ERROR_CODES.UPDATE_USER_ERROR, null));
-  }else{
-
+  try {
+    await authModel.updateProfile(user.id, nickname, profileUrl);
+   
     const responseData = {
       user_id: user_id,
       nickname: nickname,
@@ -149,6 +141,10 @@ exports.updateNickname = asyncHandler(async (req, res) => {
     console.log(responseData);
     return res.json(responseFormatter(true, 'update_success', responseData));
   }
+  catch(error){
+    return res.json(responseFormatter(false, ERROR_CODES.UPDATE_NICKNAME_ERROR, null));
+  }
+  
 });
 
 // NOTE: 비밀번호 수정
