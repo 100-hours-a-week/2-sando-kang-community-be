@@ -4,9 +4,13 @@ const ERROR_CODES = require('../exception/errors')
 const authModel = require('../models/authModel');
 const responseFormatter = require('../util/ResponseFormatter');
 const base64 = require('base-64');
-const session = require('express-session')
 const validateFields = require('../util/validateFields');
+const generateToken = require('../security/jwt');
 
+//TODO: redis를 활용한 만기토큰 관리
+//const blacklist = new Set(); 
+
+require('dotenv').config({ path: '.env.local' }); 
 
 
 // NOTE: 로그인
@@ -33,21 +37,14 @@ exports.login = asyncHandler(async (req, res, next) => {
     profileUrl = user.profile ? `${user.profile}` : null;
   }
 
-  // 세션 저장
-  req.session.user = {
-      user_id: user.id,
-      email: user.email,
-      nickname: user.nickname,
-      profile: profileUrl,
-  };
-
-  console.log(profileUrl);
+  const token = generateToken(user);
 
   const responseData = {
       user_id: user.id,
       email: user.email,
       nickname: user.nickname,
       profile: profileUrl,
+      token: token
   };
 
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -56,13 +53,11 @@ exports.login = asyncHandler(async (req, res, next) => {
 
 // NOTE: 로그아웃
 exports.logout = asyncHandler(async (req, res, next) => {
-  req.session.destroy((err) => {
-      if (err) {
-        return res.json(responseFormatter(false, ERROR_CODES.LOGOUT_FAILED, null));  
-      }
-      res.clearCookie('connect.sid');
-      return res.json(responseFormatter(true, 'logout_success'));
-  });
+   //TODO: redis 만기 토큰 관리
+   //blacklist.add(token);
+   //console.log(`Token added to blacklist: ${token}`);
+
+   return res.json(responseFormatter(true, 'logout_success', null));
 });
 
 // NOTE: 회원가입
@@ -81,18 +76,12 @@ exports.signin = asyncHandler(async (req, res, next) => {
 
     console.log(`Profile URL: ${profileUrl || 'No file uploaded'}`);
 
-    const createUser = await authModel.createUser(email, encodedPassword, nickname, profileUrl);
+    await authModel.createUser(email, encodedPassword, nickname, profileUrl);
 
-    if (!createUser) {
-      console.error('User creation failed.');
-      return res.json(responseFormatter(false, ERROR_CODES.CREATE_USER_ERROR, null));
-    }
-
-    req.session.user = { email, nickname, profile: profileUrl };
-    return res.json(responseFormatter(true, 'signin_success'));
+    return res.json(responseFormatter(true, '회원 가입이 완료 되었습니다'));
   } catch (error) {
     console.error('Error during user creation:', error.message);
-    return res.status(500).json(responseFormatter(false, 'internal_server_error', null));
+    return res.status(500).json(responseFormatter(false, ERROR_CODES.CREATE_USER_ERROR, null));
   }
 });
 
@@ -135,17 +124,15 @@ exports.updateNickname = asyncHandler(async (req, res) => {
   const user = await authModel.findUserById(user_id); 
   
   let profileUrl = null; 
-  if (req.file && req.file.buffer) {
+  if (req.file) {
     profileUrl = await handleImageProcessing(req.file.buffer, req.file.originalname);
   }else {
     profileUrl = user.profile;
   }
 
-  const updateUser = await authModel.updateProfile(user.id, nickname, profileUrl);
-  if(!updateUser) {
-    return res.json(responseFormatter(false, ERROR_CODES.UPDATE_USER_ERROR, null));
-  }else{
-
+  try {
+    await authModel.updateProfile(user.id, nickname, profileUrl);
+   
     const responseData = {
       user_id: user_id,
       nickname: nickname,
@@ -154,6 +141,10 @@ exports.updateNickname = asyncHandler(async (req, res) => {
     console.log(responseData);
     return res.json(responseFormatter(true, 'update_success', responseData));
   }
+  catch(error){
+    return res.json(responseFormatter(false, ERROR_CODES.UPDATE_NICKNAME_ERROR, null));
+  }
+  
 });
 
 // NOTE: 비밀번호 수정

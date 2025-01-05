@@ -3,23 +3,28 @@ const timeout = require('connect-timeout');
 const rateLimit = require('express-rate-limit');
 const cors = require('cors');
 const helmet = require('helmet');
-const session = require('express-session');
-const MySQLStore = require('express-mysql-session')(session);
 const path = require('path');
 const morgan = require('morgan');
 const moment = require('moment-timezone');
 const rotatingFileStream = require('rotating-file-stream');
 const fs = require('fs');
-const db = require('./db/db');
+const dotenv = require('dotenv');
+
 const globalErrorHandler = require('./middleware/globalErrorHandler');
 
 const app = express();
 const PORT = 3000;
 
-app.set('trust proxy', 1); 
 
-// 세션 저장소 설정
-const sessionStore = new MySQLStore({}, db);
+if (fs.existsSync('.env.local')) {
+  dotenv.config({ path: '.env.local' });
+  console.log('Loaded .env.local');
+} else {
+  console.log('.env.local file not found');
+}
+
+
+app.set('trust proxy', 1); 
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -80,17 +85,6 @@ app.use(
         upgradeInsecureRequests: [],
       },
     },
-  })
-);
-
-// 세션 설정
-app.use(
-  session({
-    secret: 'my_secret_key',
-    resave: false,
-    saveUninitialized: false,
-    store: sessionStore,
-    cookie: { secure: false },
   })
 );
 

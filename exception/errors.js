@@ -14,6 +14,14 @@ const ERROR_CODES = Object.freeze({
         code: 'logout_failed',
         status: 40102,
     },
+    INVALID_JWT_TOKEN: {
+        code: 'jwt_token_not_available',
+        status: 40103,
+    },
+    EXPIRED_JWT_TOKEN: {
+        code: 'jwt_token_expired',
+        status: 40104,
+    },
 
     // Not Found Error
     USER_NOT_FOUND: {
@@ -63,7 +71,7 @@ const ERROR_CODES = Object.freeze({
         status: 50007,
     },
     CREATE_USER_ERROR: {
-        code: 'user_creation_failed',
+        code: 'duplicated email',
         status: 50008,
     },
     DELETE_USER_ERROR: {
@@ -75,7 +83,7 @@ const ERROR_CODES = Object.freeze({
         status: 50010,
     },
     UPDATE_NICKNAME_ERROR: {
-        code: 'nickname_update_failed',
+        code: 'duplicated nickname',
         status: 50011,
     },
     UPDATE_PASSWORD_ERROR: {

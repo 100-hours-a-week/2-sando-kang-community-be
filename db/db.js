@@ -1,12 +1,10 @@
 const mysql = require('mysql2');
-//local 실행
-// require('dotenv').config({ path: '.env.local' }); // dotenv 올바른 설정
 
-console.log('DB_HOST:', process.env.DB_HOST ? '******' : '(Not Set)');
-console.log('DB_USER:', process.env.DB_USER ? '******' : '(Not Set)');
-console.log('DB_PASSWORD:', process.env.DB_PASSWORD ? '******' : '(Not Set)');
-console.log('DB_NAME:', process.env.DB_NAME ? '******' : '(Not Set)');
-console.log('DB_PORT:', process.env.DB_PORT || 3306 ? '******' : '(Not Set)');
+console.log('DB_HOST:', process.env.DB_HOST ? '******' : 'not set');
+console.log('DB_USER:', process.env.DB_USER ? '******' : 'not set');
+console.log('DB_PASSWORD:', process.env.DB_PASSWORD ? '******' : 'not set');
+console.log('DB_NAME:', process.env.DB_NAME ? '******' : 'not set');
+console.log('DB_PORT:', process.env.DB_PORT || 3306 ? '******' : 'not set');
 
 var pool;
 try {
