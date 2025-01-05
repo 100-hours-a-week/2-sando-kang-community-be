@@ -12,8 +12,8 @@ jobs:
     if: >
       github.event.pull_request.merged == true &&
       github.event.pull_request.base.ref == 'main' &&
-      startsWith(github.event.pull_request.head.ref, 'feature') &&
-      github.repository == '2-sando-kang-community-be'
+      github.event.pull_request.head.repo.full_name == '100-hours-a-week/2-sando-kang-community-be'
+
     runs-on: ubuntu-latest
 
     steps:
