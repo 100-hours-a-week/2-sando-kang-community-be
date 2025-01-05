@@ -71,7 +71,7 @@ const ERROR_CODES = Object.freeze({
         status: 50007,
     },
     CREATE_USER_ERROR: {
-        code: 'user_creation_failed',
+        code: 'duplicated email',
         status: 50008,
     },
     DELETE_USER_ERROR: {
@@ -83,7 +83,7 @@ const ERROR_CODES = Object.freeze({
         status: 50010,
     },
     UPDATE_NICKNAME_ERROR: {
-        code: 'nickname_update_failed',
+        code: 'duplicated nickname',
         status: 50011,
     },
     UPDATE_PASSWORD_ERROR: {
