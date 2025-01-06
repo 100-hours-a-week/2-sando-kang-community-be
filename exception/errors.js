@@ -15,11 +15,11 @@ const ERROR_CODES = Object.freeze({
         status: 40102,
     },
     INVALID_JWT_TOKEN: {
-        code: 'jwt_token_not_available',
+        code: '계정 접속 정보가 올바르지 않습니다',
         status: 40103,
     },
     EXPIRED_JWT_TOKEN: {
-        code: 'jwt_token_expired',
+        code: '접속 기간이 만료되었습니다. 다시 로그인 해주세요',
         status: 40104,
     },
 
@@ -70,7 +70,7 @@ const ERROR_CODES = Object.freeze({
         code: 'comment_deletion_failed',
         status: 50007,
     },
-    CREATE_USER_ERROR: {
+    DUPLICATE_EMAIL_ERROR: {
         code: 'duplicated email',
         status: 50008,
     },
@@ -82,7 +82,7 @@ const ERROR_CODES = Object.freeze({
         code: 'user_update_failed',
         status: 50010,
     },
-    UPDATE_NICKNAME_ERROR: {
+    DUPLICATE_NICKNAME_ERROR: {
         code: 'duplicated nickname',
         status: 50011,
     },
@@ -90,6 +90,7 @@ const ERROR_CODES = Object.freeze({
         code: 'password_update_failed',
         status: 50012,
     },
+
 });
 
 module.exports = ERROR_CODES;

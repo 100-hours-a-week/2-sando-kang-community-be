@@ -7,7 +7,7 @@ const authModel = require('../models/authModel');
 const commentModel = require('../models/commentModel');
 const likesModel = require('../models/likesModel');
 
-const validateFields = require('../util/validateFields');
+const { validateFields } = require('../util/validation');
 
 // TODO: JWT
 //NOTE: posts.js 연동 - 게시글 목록 조회
@@ -97,6 +97,7 @@ exports.getPostsById = asyncHandler(async (req, res, next) => {
 
 //TODO: JWT
 //NOTE: 게시글 작성
+// 제목 26자 제한 등 필요
 exports.createPost = asyncHandler(async (req, res, next) => {
     const { user_id, title, content } = req.body;
 

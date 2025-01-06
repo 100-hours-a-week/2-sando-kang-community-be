@@ -1,4 +1,4 @@
-const responseFormatter = (success, message, data = null) => {
+const responseFormatter = (success, message = null, data = null) => {
     return {
       success,
       message,

@@ -4,7 +4,7 @@ const commentModel = require('../models/commentModel');
 const postModel = require('../models/postModel');
 const responseFormatter = require('../util/ResponseFormatter');
 
-const validateFields = require('../util/validateFields');
+const {validateFields} = require('../util/validation');
 
 
 //NOTE: 댓글 목록 조회
