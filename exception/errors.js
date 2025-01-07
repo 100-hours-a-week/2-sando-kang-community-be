@@ -7,11 +7,11 @@ const ERROR_CODES = Object.freeze({
 
     // Unauthorized Error
     INVALID_PASSWORD: {
-        code: 'invalid_password',
+        code: '비밀번호가 틀렸습니다',
         status: 40101,
     },
     LOGOUT_FAILED: {
-        code: 'logout_failed',
+        code: '로그아웃에 실패하였습니다',
         status: 40102,
     },
     INVALID_JWT_TOKEN: {
@@ -25,69 +25,69 @@ const ERROR_CODES = Object.freeze({
 
     // Not Found Error
     USER_NOT_FOUND: {
-        code: 'user_not_found',
+        code: '회원 정보를 찾을 수 없습니다',
         status: 40401,
     },
     GET_POST_ERROR: {
-        code: 'post_not_found',
+        code: '해당 게시글을 작성한 사람만 수정 또는 삭제할 수 있습니다.',
         status: 40402,
     },
     GET_COMMENT_ERROR: {
-        code: 'comment_not_found',
+        code: '댓글 정보를 찾을 수 없습니다',
         status: 40403,
     },
 
     // Server Error
     SERVER_ERROR: {
-        code: 'internal_server_error',
+        code: '서버 내부 오류입니다',
         status: 50000,
     },
     CREATE_POST_ERROR: {
-        code: 'post_creation_failed',
+        code: '게시글 작성에 실패 하였습니다',
         status: 50001,
     },
     UPDATE_POST_ERROR: {
-        code: 'post_update_failed',
+        code: '게시글 수정에 실패 하였습니다',
         status: 50002,
     },
     DELETE_POST_ERROR: {
-        code: 'post_deletion_failed',
+        code: '게시물 삭제를 실패 하였습니다',
         status: 50003,
     },
     DELETE_POST_COMMENT_ERROR: {
-        code: 'post_comment_deletion_failed',
+        code: '댓글을 삭제하지 못하였습니다',
         status: 50004,
     },
     CREATE_COMMENT_ERROR: {
-        code: 'comment_creation_failed',
+        code: '댓글을 작성하지 못하였습니다',
         status: 50005,
     },
     UPDATE_COMMENT_ERROR: {
-        code: 'comment_update_failed',
+        code: '댓글을 수정하지 못하였습니다',
         status: 50006,
     },
     DELETE_COMMENT_ERROR: {
-        code: 'comment_deletion_failed',
+        code: '좋아요 감소 실패입니다',
         status: 50007,
     },
     DUPLICATE_EMAIL_ERROR: {
-        code: 'duplicated email',
+        code: '중복된 이메일입니다',
         status: 50008,
     },
     DELETE_USER_ERROR: {
-        code: 'user_deletion_failed',
+        code: '회원 탈퇴 실패하였습니다',
         status: 50009,
     },
     UPDATE_USER_ERROR: {
-        code: 'user_update_failed',
+        code: '회원 정보 수정 실패하였습니다',
         status: 50010,
     },
     DUPLICATE_NICKNAME_ERROR: {
-        code: 'duplicated nickname',
+        code: '중복된 닉네임입니다',
         status: 50011,
     },
     UPDATE_PASSWORD_ERROR: {
-        code: 'password_update_failed',
+        code: '비밀번호 수정을 실패하였습니다',
         status: 50012,
     },
 
