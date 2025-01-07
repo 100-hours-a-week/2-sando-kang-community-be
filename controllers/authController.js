@@ -25,7 +25,7 @@ exports.login = asyncHandler(async (req, res, next) => {
 
   const user = await authModel.findUserByEmail(email);
   if (encodedPassword !== user.password) {
-    return res.status(401).json(responseFormatter(false, ERROR_CODES.INVALID_PASSWORD, null));
+    return res.status(401).json(responseFormatter(false, ERROR_CODES.INVALID_PASSWORD, '비밀번호가 틀렸습니다'));
   }
 
   let profileUrl = null;

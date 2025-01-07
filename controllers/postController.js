@@ -9,7 +9,6 @@ const likesModel = require('../models/likesModel');
 
 const { validateFields } = require('../util/validation');
 
-// TODO: JWT
 //NOTE: posts.js 연동 - 게시글 목록 조회
 exports.getPosts = asyncHandler(async (req, res) => {
     const page = parseInt(req.query.page) || 1; 
@@ -37,33 +36,46 @@ exports.getPosts = asyncHandler(async (req, res) => {
     return res.json(responseFormatter(true, "get_posts_success", { postData, hasMore }));
   });
   
-  
-  
-
-// TODO: JWT
 // NOTE: 게시글 + 댓글 조회
+const memoryStore = new Map();
 exports.getPostsById = asyncHandler(async (req, res, next) => {
     const { postId } = req.params;
+    const clientIp = req.ip;
+    const currentTime = Date.now();
 
     validateFields(['postId'], req.params);
-    
-    //NOTE: 조회수 증가
-    await postModel.updateViews(postId);
+
+    const key = `post:${postId}:ip:${clientIp}`;
+
+    if (memoryStore.has(key)) {
+        const lastRequestTime = memoryStore.get(key);
+
+        // 1시간(3600000ms) 내 요청 시 조회수 증가 방지
+        if (currentTime - lastRequestTime < 3600000) {
+            console.log(`IP ${clientIp}의 요청이 제한되었습니다.`);
+        } else {
+            await postModel.updateViews(postId);
+            memoryStore.set(key, currentTime);
+        }
+    } else {
+        await postModel.updateViews(postId);
+        memoryStore.set(key, currentTime);
+    }
 
     const post = await postModel.getPostById(postId);
     if (!post) {
-        return res.json(responseFormatter(false, ERROR_CODES.GET_POST_ERROR, null));  
+        return res.json(responseFormatter(false, ERROR_CODES.GET_POST_ERROR, null));
     }
 
     const user = await authModel.findUserById(post.user_id);
-    const author = user ? user.nickname : 'Unknown';
-   
+    const author = user ? user.nickname : "Unknown";
+
     const comments = await commentModel.findCommentsByPostId(postId);
     const formattedComments = comments.map((comment) => ({
         id: comment.id,
         user_id: comment.user_id,
         content: comment.comment,
-        author: comment.author || 'Unknown',
+        author: comment.author || "Unknown",
         date: comment.date,
     }));
 
@@ -91,10 +103,10 @@ exports.getPostsById = asyncHandler(async (req, res, next) => {
         commentsCnt: post.comments,
         comment: formattedComments,
     };
-    console.log(postData)
-    return res.json(responseFormatter(true, 'get_posts_succcess', { postData }));
-});
 
+    console.log(postData);
+    return res.json(responseFormatter(true, "get_posts_success", { postData }));
+});
 //TODO: JWT
 //NOTE: 게시글 작성
 // 제목 26자 제한 등 필요
