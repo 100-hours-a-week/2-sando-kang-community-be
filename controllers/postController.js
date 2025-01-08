@@ -43,7 +43,11 @@ exports.getPostsById = asyncHandler(async (req, res, next) => {
     const clientIp = req.ip;
     const currentTime = Date.now();
 
-    validateFields(['postId'], req.params);
+    try {
+        validateFields(['postId'], req.params);
+    }catch(error){
+        return res.status(400).json(responseFormatter(false, ERROR_CODES.MISSING_FIELDS, error.message));
+    }
 
     const key = `post:${postId}:ip:${clientIp}`;
 
@@ -116,7 +120,12 @@ exports.createPost = asyncHandler(async (req, res, next) => {
     const image = req.file ? req.file.path : null;
     console.log(`이미지: ${image}`);
     const date = new Date().toISOString().slice(0, 10);
-    validateFields(['user_id', 'title' , 'content'], req.body);
+    
+    try {
+        validateFields(['user_id', 'title', 'content'], req.body);
+    } catch (error) {
+        return res.status(400).json(responseFormatter(false, ERROR_CODES.MISSING_FIELDS, error.message));
+    }
 
     let postUrl = null;
     if (req.file && req.file.buffer) {
@@ -135,12 +144,6 @@ exports.createPost = asyncHandler(async (req, res, next) => {
 exports.updatePost = asyncHandler(async (req, res, next) => {
     const { user_id, post_id, title, content, date } = req.body;
 
-    console.log(`user_id: ${user_id}`);
-    console.log(`post_id: ${post_id}`);
-    console.log(`title: ${title}`);
-    console.log(`content: ${content}`);
-    console.log(`date: ${date}`);
-
     let postUrl = null;
     if (req.file && req.file.buffer) {
         postUrl = await handleImageProcessing(req.file.buffer, req.file.originalname);
@@ -150,7 +153,11 @@ exports.updatePost = asyncHandler(async (req, res, next) => {
 
     console.log(`post url : ${postUrl}`)
 
-    validateFields(['user_id', 'post_id', 'title', 'content', 'date'], req.body);
+    try {
+        validateFields(['user_id', 'post_id', 'title', 'content', 'date'], req.body);
+    } catch (error) {
+        return res.status(400).json(responseFormatter(false, ERROR_CODES.MISSING_FIELDS, error.message));
+    }
 
     const post = await postModel.getPostById(post_id);
 
@@ -171,7 +178,11 @@ exports.updatePost = asyncHandler(async (req, res, next) => {
 exports.deletePost = asyncHandler(async (req, res, next) => {
     const { user_id, post_id } = req.body;
 
-    validateFields(['user_id', 'post_id'], req.body);
+    try {
+        validateFields(['user_id', 'post_id'], req.body);
+    } catch (error) {
+        return res.status(400).json(responseFormatter(false, ERROR_CODES.MISSING_FIELDS, error.message));
+    }
 
     const post = await postModel.getPostById(post_id);
     
@@ -193,7 +204,11 @@ exports.deletePost = asyncHandler(async (req, res, next) => {
 exports.patchPost = asyncHandler(async (req, res, next) => {
     const { user_id, post_id } = req.body;
 
-    validateFields(['user_id', 'post_id'], req.body);
+    try {
+        validateFields(['user_id', 'post_id'], req.body);
+    } catch (error) {
+        return res.status(400).json(responseFormatter(false, ERROR_CODES.MISSING_FIELDS, error.message));
+    }
 
     // validate likes duplication
     const likes = await likesModel.validateLikes(user_id, post_id);
