@@ -10,6 +10,7 @@ exports.findCommentsByPostId = async (postId) => {
         comment.user_id,
         comment.comment, 
         user.nickname AS author, 
+        user.profile AS profile,
         comment.date
     FROM 
         comment
