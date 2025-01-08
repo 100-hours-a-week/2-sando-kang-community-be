@@ -109,7 +109,7 @@ exports.withdraw = asyncHandler(async (req, res, next) => {
   try {
     validateFields(['user_id'], req.body);
   } catch (error) {
-    return res.status(400).json(responseFormatter(false, ERROR_CODES.VALIDATION_ERROR, error.message));
+    return res.status(400).json(responseFormatter(false, ERROR_CODES.MISSING_FIELDS, error.message));
   }
 
   const user = await authModel.findUserById(user_id);
@@ -142,9 +142,15 @@ exports.updateNickname = asyncHandler(async (req, res) => {
 
   try {
     validateFields(['user_id', 'nickname'], req.body);
+  
+    const validationResult = await validateNickname(nickname);
+    if (!validationResult.success) {
+      return res.status(400).json(validationResult);
+    }
   } catch (error) {
-    return res.status(400).json(responseFormatter(false, ERROR_CODES.VALIDATION_ERROR, error.message));
+    return res.status(400).json(responseFormatter(false, ERROR_CODES.MISSING_FIELDS, error.message));
   }
+  
 
   const user = await authModel.findUserById(user_id); 
   

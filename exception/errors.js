@@ -23,6 +23,11 @@ const ERROR_CODES = Object.freeze({
         status: 40104,
     },
 
+    INVALID_NICKNAME_ERROR: {
+        code: '닉네임 오류가 발생하였습니다. 닉네임을 확인해주세요',
+        status: 40105,
+    },
+
     // Not Found Error
     USER_NOT_FOUND: {
         code: '회원 정보를 찾을 수 없습니다',
