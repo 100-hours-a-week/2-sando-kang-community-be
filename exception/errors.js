@@ -83,7 +83,7 @@ const ERROR_CODES = Object.freeze({
         status: 50010,
     },
     DUPLICATE_NICKNAME_ERROR: {
-        code: '중복된 닉네임입니다',
+        code: '중복된 닉네임입니다 다른 닉네임을 선택해주세요',
         status: 50011,
     },
     UPDATE_PASSWORD_ERROR: {
