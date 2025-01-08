@@ -7,7 +7,6 @@ const authenticateJWT = (req, res, next) => {
 
   if (token) {
     const cleanToken = token.startsWith('Bearer ') ? token.replace('Bearer ', '') : token;
-    console.log(`token : ${cleanToken}`);
     jwt.verify(cleanToken, process.env.JWT_SECRET_KEY, (err, user) => {
       if (err) {
         console.error('JWT Verification Error:', err.message);
