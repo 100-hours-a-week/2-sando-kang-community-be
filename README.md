@@ -1,7 +1,7 @@
 # 커뮤니티 만들기
 카카오테크 클라우드 네이티브 in Jeju 2기 커뮤니티 과제
 
-## <div><img src="https://capsule-render.vercel.app/api?type=waving&color=auto&height=200&section=header&text=산도-커뮤니티BE&fontSize=80" /></div>
+## <div><img src="https://capsule-render.vercel.app/api?type=waving&color=auto&height=200&section=header&text=SQUID-WORLD&fontSize=80" /></div>
 
 - - - - - - - - - - - - - - - -
 
@@ -15,8 +15,9 @@
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-## 시연영상
-<div>https://drive.google.com/file/d/13OrKZvx92UJBFI9sVy1_J4hLt8yA09Yx/view?usp=sharing</div>
+## 오징어월드
+![image](https://github.com/user-attachments/assets/7fe36c08-ee85-4897-97c5-fcf3658635aa)
+
 
 
 ## Stack
