@@ -80,6 +80,7 @@ exports.getPostsById = asyncHandler(async (req, res, next) => {
         user_id: comment.user_id,
         content: comment.comment,
         author: comment.author || "Unknown",
+        comment_profile: comment.profile || "Unknown",
         date: comment.date,
     }));
 
