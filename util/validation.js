@@ -43,7 +43,7 @@ const validatePassword = (password) => {
 const validateFields = (fields, data) => {
   for (const field of fields) {
     if (!data[field]) {
-      return responseFormatter(false, ERROR_CODES.MISSING_FIELDS(field), `${field} 값이 누락되었습니다.`);
+        throw new Error(`${field} 값이 누락되었습니다.`);
     }
   }
 

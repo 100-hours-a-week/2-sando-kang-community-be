@@ -106,7 +106,11 @@ exports.signin = asyncHandler(async (req, res, next) => {
 exports.withdraw = asyncHandler(async (req, res, next) => {
   const { user_id } = req.body;
 
-  validateFields(['user_id'], req.body);
+  try {
+    validateFields(['user_id'], req.body);
+  } catch (error) {
+    return res.status(400).json(responseFormatter(false, ERROR_CODES.VALIDATION_ERROR, error.message));
+  }
 
   const user = await authModel.findUserById(user_id);
   if (!user) {
@@ -136,7 +140,11 @@ exports.withdraw = asyncHandler(async (req, res, next) => {
 exports.updateNickname = asyncHandler(async (req, res) => {
   const { user_id, nickname} = req.body;
 
-  validateFields(['user_id', 'nickname'], req.body);
+  try {
+    validateFields(['user_id', 'nickname'], req.body);
+  } catch (error) {
+    return res.status(400).json(responseFormatter(false, ERROR_CODES.VALIDATION_ERROR, error.message));
+  }
 
   const user = await authModel.findUserById(user_id); 
   
@@ -168,7 +176,11 @@ exports.updateNickname = asyncHandler(async (req, res) => {
 exports.updatePassword = asyncHandler(async (req, res, next) => {
   const { user_id, password } = req.body;
 
-  validateFields(['user_id', 'password'], req.body);
+  try {
+    validateFields(['user_id', 'password'], req.body);
+  } catch (error) {
+    return res.status(400).json(responseFormatter(false, ERROR_CODES.VALIDATION_ERROR, error.message));
+  }
 
   const encodedPassword = base64.encode(password);
   const updatePassword = await authModel.updatePassword(user_id, encodedPassword);

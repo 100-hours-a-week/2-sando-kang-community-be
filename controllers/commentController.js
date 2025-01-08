@@ -11,7 +11,11 @@ const {validateFields} = require('../util/validation');
 exports.getCommentsByPostId = asyncHandler(async (req, res) => {
     const { postId } = req.params;
 
-    validateFields(['postId'], req.body);
+    try {
+        validateFields(['postId'], req.params);
+    } catch (error) {
+        return res.status(400).json(responseFormatter(false, ERROR_CODES.MISSING_FIELDS, error.message));
+    }
 
     const comments = await commentModel.getCommentsByPostId(postId); 
 
@@ -30,7 +34,11 @@ exports.getCommentsByPostId = asyncHandler(async (req, res) => {
 exports.createComment = asyncHandler(async (req, res, next) => {
     const { user_id, post_id, comment } = req.body;
 
-    validateFields(['user_id', 'post_id', 'comment'], req.body);
+    try {
+        validateFields(['user_id', 'post_id', 'comment'], req.body);
+    } catch (error) {
+        return res.status(400).json(responseFormatter(false, ERROR_CODES.MISSING_FIELDS, error.message));
+    }
 
     const date = new Date().toISOString().slice(0, 10);
     const createComment = await commentModel.createComment(user_id, post_id, comment, date);
@@ -49,7 +57,11 @@ exports.createComment = asyncHandler(async (req, res, next) => {
 exports.updateComment = asyncHandler(async (req, res, next) => {
     const { user_id, comment_id, content } = req.body;
 
-    validateFields(['user_id', 'comment_id', 'content'], req.body);
+    try {
+        validateFields(['user_id', 'comment_id', 'content'], req.body);
+    } catch (error) {
+        return res.status(400).json(responseFormatter(false, ERROR_CODES.MISSING_FIELDS, error.message));
+    }
     
     const date = new Date().toISOString().slice(0, 10);
     const result = await commentModel.updateComment(content, date, comment_id, user_id);
@@ -65,7 +77,11 @@ exports.updateComment = asyncHandler(async (req, res, next) => {
 exports.deleteComment = asyncHandler(async (req, res, next) => {
     const { user_id, comment_id, post_id } = req.body;
 
-    validateFields(['user_id', 'comment_id', 'post_id'], req.body);
+    try {
+        validateFields(['user_id', 'comment_id', 'post_id'], req.body);
+    } catch (error) {
+        return res.status(400).json(responseFormatter(false, ERROR_CODES.MISSING_FIELDS, error.message));
+    }
 
     const deleteResult = await commentModel.deleteComment(comment_id, user_id);
     if (!deleteResult) {
