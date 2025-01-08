@@ -4,7 +4,7 @@ const commentModel = require('../models/commentModel');
 const postModel = require('../models/postModel');
 const responseFormatter = require('../util/ResponseFormatter');
 
-const {validateFields} = require('../util/validation');
+const {validateFields, validateContentLength} = require('../util/validation');
 
 
 //NOTE: 댓글 목록 조회
@@ -36,6 +36,7 @@ exports.createComment = asyncHandler(async (req, res, next) => {
 
     try {
         validateFields(['user_id', 'post_id', 'comment'], req.body);
+        validateContentLength(comment);
     } catch (error) {
         return res.status(400).json(responseFormatter(false, ERROR_CODES.MISSING_FIELDS, error.message));
     }
@@ -59,6 +60,7 @@ exports.updateComment = asyncHandler(async (req, res, next) => {
 
     try {
         validateFields(['user_id', 'comment_id', 'content'], req.body);
+        validateContentLength(content);
     } catch (error) {
         return res.status(400).json(responseFormatter(false, ERROR_CODES.MISSING_FIELDS, error.message));
     }
