@@ -24,7 +24,7 @@ const ERROR_CODES = Object.freeze({
     },
 
     INVALID_NICKNAME_ERROR: {
-        code: '닉네임 오류가 발생하였습니다. 닉네임을 확인해주세요',
+        code: '닉네임 형태가 올바르지 않습니다. 닉네임을 확인해주세요',
         status: 40105,
     },
 
