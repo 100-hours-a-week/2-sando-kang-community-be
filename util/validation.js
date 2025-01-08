@@ -50,15 +50,27 @@ const validateFields = (fields, data) => {
   return responseFormatter(true, null, '필드 검증 성공');
 };
 
-// 닉네임 중복 검사
 const validateNickname = async (nickname) => {
-  const isDuplicate = await checkNicknameExists(nickname);
-  if (isDuplicate) {
-    return responseFormatter(false, ERROR_CODES.DUPLICATE_NICKNAME_ERROR, '이미 사용 중인 닉네임입니다. 다른 닉네임을 설정해주세요.');
-  }
-
-  return responseFormatter(true, null, '닉네임 검증 성공');
-};
+    // 최대 10자 제한
+    if (nickname.length > 10) {
+      return responseFormatter(false, ERROR_CODES.INVALID_NICKNAME_ERROR, '닉네임은 최대 10자까지 작성 가능합니다');
+    }
+  
+    // 띄어쓰기 금지
+    if (nickname.includes(' ')) {
+      return responseFormatter(false, ERROR_CODES.INVALID_NICKNAME_ERROR, '닉네임에 띄어쓰기를 포함할 수 없습니다');
+    }
+  
+    // 닉네임 중복 검사
+    const isDuplicate = await checkNicknameExists(nickname);
+    if (isDuplicate) {
+      return responseFormatter(false, ERROR_CODES.DUPLICATE_NICKNAME_ERROR, '이미 사용 중인 닉네임입니다. 다른 닉네임을 설정해주세요');
+    }
+  
+    return responseFormatter(true, null, '닉네임 검증 성공');
+  };
+  
+  
 
 const validateTitleLength = (title) => {
     if (title.length > 26) {
