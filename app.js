@@ -28,7 +28,7 @@ app.set('trust proxy', 1);
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 1000,
+  max: 5000,
   message: 'api 과다 요청 발생. 5분 뒤에 다시 요청하세요',
   standardHeaders: true,
   legacyHeaders: false,
