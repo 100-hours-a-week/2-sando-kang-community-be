@@ -60,6 +60,18 @@ const validateNickname = async (nickname) => {
   return responseFormatter(true, null, '닉네임 검증 성공');
 };
 
+const validateTitleLength = (title) => {
+    if (title.length > 26) {
+        throw new Error('제목은 26자를 넘길 수 없습니다.');
+    }
+};
+
+const validateContentLength = (content) => {
+    if (content.length > 100) {
+        throw new Error('내용은 100자를 넘길 수 없습니다.');
+    }
+};
+
 module.exports = {
   validateEmailFormat,
   validateEmailExists,
@@ -67,4 +79,6 @@ module.exports = {
   validatePassword,
   validateFields,
   validateNickname,
+  validateTitleLength,
+  validateContentLength
 };

@@ -1,7 +1,7 @@
 const ERROR_CODES = Object.freeze({
     // Bad Request Error
     MISSING_FIELDS: (value) => ({
-        code: `invalid_${value}`,
+        code: `${value} 값이 누락되어 있습니다`,
         status: 40000,
     }),
 

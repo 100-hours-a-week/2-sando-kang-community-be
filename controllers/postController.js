@@ -7,7 +7,7 @@ const authModel = require('../models/authModel');
 const commentModel = require('../models/commentModel');
 const likesModel = require('../models/likesModel');
 
-const { validateFields } = require('../util/validation');
+const { validateFields, validateContentLength, validateTitleLength } = require('../util/validation');
 
 //NOTE: posts.js 연동 - 게시글 목록 조회
 exports.getPosts = asyncHandler(async (req, res) => {
@@ -123,6 +123,8 @@ exports.createPost = asyncHandler(async (req, res, next) => {
     
     try {
         validateFields(['user_id', 'title', 'content'], req.body);
+        validateTitleLength(title);
+        validateContentLength(content);
     } catch (error) {
         return res.status(400).json(responseFormatter(false, ERROR_CODES.MISSING_FIELDS, error.message));
     }
@@ -155,6 +157,8 @@ exports.updatePost = asyncHandler(async (req, res, next) => {
 
     try {
         validateFields(['user_id', 'post_id', 'title', 'content', 'date'], req.body);
+        validateTitleLength(title);
+        validateContentLength(content);
     } catch (error) {
         return res.status(400).json(responseFormatter(false, ERROR_CODES.MISSING_FIELDS, error.message));
     }
