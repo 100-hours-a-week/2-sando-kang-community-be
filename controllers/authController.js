@@ -159,7 +159,7 @@ exports.updateNickname = asyncHandler(async (req, res) => {
     return res.json(responseFormatter(true, 'update_success', responseData));
   }
   catch(error){
-    return res.json(responseFormatter(false, ERROR_CODES.UPDATE_NICKNAME_ERROR, null));
+    return res.json(responseFormatter(false, ERROR_CODES.DUPLICATE_NICKNAME_ERROR, null));
   }
   
 });
