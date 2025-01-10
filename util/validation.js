@@ -31,14 +31,23 @@ const validateEmailFormat = (email) => {
 
 // 비밀번호 형식 검사
 const validatePassword = (password) => {
-  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9])[A-Za-z\d@$!%*?&]{8,20}$/;
-  
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#^])[A-Za-z\d@$!%*?&#^]{8,20}$/;
+
+  // 정규식 검사
   if (!passwordRegex.test(password)) {
-      return responseFormatter(false, ERROR_CODES.INVALID_PASSWORD, '비밀번호는 8자 이상, 20자 이하이며, 대문자, 소문자, 숫자, 특수문자를 최소 1개 포함해야 합니다.');
+      return {
+          success: false,
+          errorCode: "INVALID_PASSWORD",
+          message: "비밀번호는 8자 이상, 20자 이하이며, 대문자, 소문자, 숫자, 특수문자 (@, $, !, %, *, ?, &, #, ^)를 최소 1개 포함해야 합니다.",
+      };
   }
 
-  return responseFormatter(true, null, '비밀번호 검증 성공');
+  return {
+      success: true,
+      message: "비밀번호 검증 성공",
+  };
 };
+
 
   
 
