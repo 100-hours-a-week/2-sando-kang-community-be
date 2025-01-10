@@ -31,13 +31,15 @@ const validateEmailFormat = (email) => {
 
 // 비밀번호 형식 검사
 const validatePassword = (password) => {
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z0-9])[A-Za-z\\d@$!%*?&]{8,20}$/;
-    if (!passwordRegex.test(password)) {
-      return responseFormatter(false, ERROR_CODES.INVALID_PASSWORD, '비밀번호는 8자 이상, 20자 이하이며, 대문자, 소문자, 숫자, 특수문자를 최소 1개 포함해야 합니다.');
-    }
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9])[A-Za-z\d@$!%*?&]{8,20}$/;
   
-    return responseFormatter(true, null, '비밀번호 검증 성공');
-  };
+  if (!passwordRegex.test(password)) {
+      return responseFormatter(false, ERROR_CODES.INVALID_PASSWORD, '비밀번호는 8자 이상, 20자 이하이며, 대문자, 소문자, 숫자, 특수문자를 최소 1개 포함해야 합니다.');
+  }
+
+  return responseFormatter(true, null, '비밀번호 검증 성공');
+};
+
   
 
 // 필드 유효성 검사
@@ -52,17 +54,15 @@ const validateFields = (fields, data) => {
 };
 
 const validateNickname = async (nickname) => {
-    // 최대 10자 제한
+
     if (nickname.length > 10) {
       return responseFormatter(false, ERROR_CODES.INVALID_NICKNAME_ERROR, '닉네임은 최대 10자까지 작성 가능합니다');
     }
   
-    // 띄어쓰기 금지
     if (nickname.includes(' ')) {
       return responseFormatter(false, ERROR_CODES.INVALID_NICKNAME_ERROR, '닉네임에 띄어쓰기를 포함할 수 없습니다');
     }
   
-    // 닉네임 중복 검사
     const isDuplicate = await checkNicknameExists(nickname);
     if (isDuplicate) {
       return responseFormatter(false, ERROR_CODES.DUPLICATE_NICKNAME_ERROR, '이미 사용 중인 닉네임입니다. 다른 닉네임을 설정해주세요');
