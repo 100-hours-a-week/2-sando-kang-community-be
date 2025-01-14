@@ -23,7 +23,6 @@ if (fs.existsSync('.env.local')) {
   console.log('.env.local file not found');
 }
 
-
 app.set('trust proxy', 1); 
 
 const limiter = rateLimit({
