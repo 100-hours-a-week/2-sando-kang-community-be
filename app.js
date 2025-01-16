@@ -99,7 +99,7 @@ app.use('/api/comment', commentRouter);
 app.use('/api/health', healthRouter);
 
 app.get('/', (req, res) => {
-  res.send('Hello, Express new EC2 Deployed!');// 수정 내용
+  res.send('Hello, Express new EC2 Deployed!');
 });
 
 app.get('/terms', (req, res) => {
